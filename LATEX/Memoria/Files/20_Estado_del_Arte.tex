@@ -1,0 +1,71 @@
+%!TEX root = ../main.tex
+
+\chapter{Estado del arte}
+\label{ch:estado_del_arte}
+
+En este capítulo se hace un análisis del estado actual de las tecnologías relevantes en este proyecto con el objetivo de justificar las decisiones tomadas durante el desarrollo.
+
+
+% =========================================================================
+\section{Instrumentación aviónica y normativa de referencia}
+\label{sec:ea_avionica}
+
+Desde los primeros aviones hasta los actuales, todos han dispuesto de algún tipo de instrumentación para poder determinar las condiciones de vuelo, por esto la instrumentación ha evolucionado desde los indicadores mecánicos analógicos hasta las pantallas electrónicas presentes hoy en día, en las que los instrumentos principales se integran en una única pantalla denominada \textit{Primary Flight Display} (PFD). La distribución estándar en el PFD se denomina \textit{Basic-T}, la cual ha sido consolidada durante décadas de uso. En ella se disponen los instrumentos de la siguiente forma: horizonte artificial en el centro, velocidad a la izquierda, altitud a la derecha y rumbo debajo \cite{faa_phak, collinson2011}. Esta distribución aprovecha el patrón natural del barrido visual de los pilotos y es un requisito de la Advisory Circular AC-25-11B \cite{ac25_11b}.
+
+La plataforma desarrollada en este proyecto no requiere de certificación ni en hardware ni en software, aun así se han seguido las directrices de las principales normas aeronáuticas con fines académicos: la AC-25-11B \cite{ac25_11b} para la
+disposición de la información, la HF-STD-001B \cite{hfstd001b} para factores humanos y simbología, la SAE-AS8034C \cite{sae_as8034c} para requisitos de rendimiento de las pantallas, y las secciones 14-CFR-\S\,25.1321 y 25.1322 \cite{cfr25_1321, cfr25_1322} para la jerarquía de color de las alertas. En el \cref{ch:software} se indica cómo y dónde se aplica cada norma en el diseño del PFD.
+
+% =========================================================================
+\newpage
+\section{Plataformas experimentales de bajo coste}
+\label{sec:ea_plataformas}
+
+El bajo coste actual de los sensores MEMS y de microcontroladores potentes han impulsado el desarrollo de plataformas de instrumentación de vuelo económicas, para uso en drones económicos o proyectos personales. Dapper-e-Silva et al.
+\cite{dapper2018} demostraron la viabilidad de la instrumentación de vuelo de bajo coste con una plataforma basada en Arduino Nano, MPU-6050 y BMP180, la cual validan en vuelo real. Otro ejemplo, en \cite{das2025} se implementa un filtro complementario sobre MPU-6050 con Arduino, obteniendo resultados estables en condiciones estáticas.
+
+Para proyectos de código abierto con objetivos similares a este se pueden encontrar ejemplos como el proyecto ESP32\_IMU\_BARO\_GPS\_VARIO \cite{harinair_vario}, el cual presenta la referencia más próxima a este proyecto, emplea ESP32
+con MPU-9250, barómetro y GPS con fusión Mahony, validado en vuelo para un variómetro de parapente. En cuanto a controladores de vuelo existen ejemplos como ArduPilot, donde se emplea un EKF de 24 estados sobre Pixhawk, mientras que Betaflight e iNav utilizan el filtro de Mahony a tasas superiores a \SI{4}{\kilo\hertz}.
+
+
+% =========================================================================
+\section{Protocolo ARINC~429}
+\label{sec:ea_arinc}
+
+El protocolo ARINC-429 \cite{arinc429} es el bus de datos digital más extendido en la aviación comercial desde 1977. Se basa en un enlace unidireccional punto a punto con señalización diferencial bipolar y palabras de 32~bits \cite{aim_arinc429}. En este proyecto se reutiliza su capa lógica como formato de la telemetría; la justificación de esta elección se desarrolla en la \cref{sec:arinc_arq} y el formato de palabra detallado en la \cref{sec:fw_word}.
+
+
+% =========================================================================
+\section{Algoritmos de fusión de sensores}
+\label{sec:ea_fusion}
+
+La estimación de la orientación a partir de sensores MEMS requiere fusionar medidas complementarias, ya que cada sensor tiene limitaciones que hacen imposible determinar la correcta orientación únicamente con el mismo. El acelerómetro y el magnetómetro proporcionan referencias absolutas de la vertical y del rumbo respectivamente, pero son sensibles al ruido y a distorsiones del campo local \cite{woodman2007}. El giroscopio complementa estas medidas con precisión a corto plazo, aunque acumula deriva con el tiempo. La fusión de los tres permite extraer la correcta orientación superando las limitaciones de cada uno de los sensores.
+
+Los algoritmos de fusión disponibles abarcan desde el filtro complementario básico (un parámetro, representación Euler, sin estimación de bias) hasta filtros de partículas (máxima precisión pero computacionalmente inviables en tiempo real). Para este proyecto se selecciona el filtro de Mahony \cite{mahony2008}, un filtro complementario no lineal basado en cuaterniones, con un controlador PI que estima y compensa la deriva del giroscopio en tiempo real. Diversos estudios comparativos respaldan esta elección para plataformas embebidas: Cocoli y Badia \cite{cocoli2023} lo identifican como el mejor equilibrio entre precisión y coste computacional en ESP32. Uyar \cite{uyar2024} obtiene conclusiones similares. Gui et al. \cite{gui2015} confirman que la diferencia de precisión frente a un Kalman lineal es marginal mientras el consumo computacional es mucho menor. La \cref{tab:filtros_comp} ofrece una comparativa visual de estos filtros.
+
+\begin{table}[H]
+\centering
+\caption{Comparativa de algoritmos de fusión sensorial para ESP32-S3 a \SI{240}{\mega\hertz}.}
+\label{tab:filtros_comp}
+\small
+\begin{tabular}{@{}l c c c c@{}}
+\toprule
+\textbf{Filtro} & \textbf{Coste} & \textbf{Precisión} & \textbf{\textit{Gimbal lock}} & \textbf{Bias} \\
+\midrule
+Complementario     & Muy bajo  & Media      & Sí  & No         \\
+Mahony             & Bajo      & Media-alta & No  & Sí         \\
+Madgwick           & Bajo      & Alta       & No  & Implícito  \\
+EKF (7 estados)    & Medio     & Alta       & No  & Sí         \\
+UKF (7 estados)    & Alto      & Muy alta   & No  & Sí         \\
+Partículas (N=100) & Muy alto  & Máxima     & No  & Sí         \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+El filtro Mahony se ha seleccionado frente al Madgwick por la capacidad de compensar activamente el bias del giroscopio mediante el término integral del controlador PI. Además, el coste computacional es ligeramente inferior. Por último, al disponer del controlador PI se puede ajustar la respuesta transitoria. El desarrollo teórico de este filtro y los detalles de su implementación sobre el ESP32-S3 se presentan en el \cref{ch:firmware}.
+
+
+% =========================================================================
+\section{Contribución del presente proyecto}
+\label{sec:ea_contribucion}
+
+La contribución del presente proyecto es una plataforma educativa que combina, en un mismo sistema, los elementos relevantes para el aprendizaje de la instrumentación aviónica: sensores físicos (IMU, barómetro, GPS, radar FMCW, telémetro ToF), telemetría codificada en ARINC 429 sobre el transceptor NRF24L01+, y un PFD en Processing que sigue las directrices de AC-25-11B, HF-STD-001B y SAE AS8034C.

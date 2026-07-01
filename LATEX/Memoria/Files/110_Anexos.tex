@@ -1,0 +1,97 @@
+%!TEX root = ../main.tex
+
+% ========================================================================
+%  ANEXOS - LISTADOS DE CODIGO
+%  Este fichero se incluye despues de \appendix en main.tex.
+%  Los \lstinputlisting apuntan a la carpeta Codigo/. Coloca tu codigo en
+%  Memoria/Codigo/ (o ajusta la ruta) con esta estructura:
+%     Codigo/Transmisor/   -> los .ino y .h del transmisor
+%     Codigo/Receptor/     -> FlightInstruments_Receiver.ino
+%     Codigo/PFD/          -> los .pde del Processing
+%  Los estilos Arduino y Processing estan definidos en packages.tex.
+% ========================================================================
+
+\chapter{Código del firmware del transmisor}
+\label{anexo:fw_tx}
+
+Se incluye a continuación el código completo del firmware del nodo transmisor,
+desarrollado en Arduino/C++ y descrito en el \cref{ch:firmware}. El sketch se
+organiza en varias unidades de compilación: la configuración y las estructuras de
+datos compartidas, la adquisición y calibración de cada sensor, la fusión de
+actitud y el sistema de telemetría.
+
+\section{Config.h}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/Config.h}
+
+\section{SensorData.h}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/SensorData.h}
+
+\section{FlightInstruments.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/FlightInstruments.ino}
+
+\section{IMU.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/IMU.ino}
+
+\section{Calibration.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/Calibration.ino}
+
+\section{SensorFusion.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/SensorFusion.ino}
+
+\section{Barometer.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/Barometer.ino}
+
+\section{GPS.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/GPS.ino}
+
+\section{ToF.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/ToF.ino}
+
+\section{Radar.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/Radar.ino}
+
+\section{Telemetry.ino}
+\lstinputlisting[style=Arduino]{Codigo/Transmisor/Telemetry.ino}
+
+
+\chapter{Código del firmware del receptor}
+\label{anexo:fw_rx}
+
+Se incluye el código del nodo receptor, que decodifica los paquetes ARINC 429
+recibidos por radio y los entrega al PC por el puerto serie, según lo descrito en
+el \cref{ch:firmware}.
+
+\section{FlightInstruments\_Receiver.ino}
+\lstinputlisting[style=Arduino]{Codigo/Receptor/FlightInstruments_Receiver.ino}
+
+
+\chapter{Código del PFD en Processing}
+\label{anexo:pfd}
+
+Se incluye el código completo del Primary Flight Display, desarrollado en
+Processing y descrito en el \cref{ch:software}. Cada instrumento de la disposición
+Basic-T se implementa en su propio fichero.
+
+\section{FlightDisplay.pde}
+\lstinputlisting[style=Processing]{Codigo/PFD/FlightDisplay.pde}
+
+\section{AttitudeIndicator.pde}
+\lstinputlisting[style=Processing]{Codigo/PFD/AttitudeIndicator.pde}
+
+\section{HeadingIndicator.pde}
+\lstinputlisting[style=Processing]{Codigo/PFD/HeadingIndicator.pde}
+
+\section{AltimeterMSL.pde}
+\lstinputlisting[style=Processing]{Codigo/PFD/AltimeterMSL.pde}
+
+\section{GroundSpeedIndicator.pde}
+\lstinputlisting[style=Processing]{Codigo/PFD/GroundSpeedIndicator.pde}
+
+\section{VSI.pde}
+\lstinputlisting[style=Processing]{Codigo/PFD/VSI.pde}
+
+\section{ProximityIndicator.pde}
+\lstinputlisting[style=Processing]{Codigo/PFD/ProximityIndicator.pde}
+
+\section{GPSMap.pde}
+\lstinputlisting[style=Processing]{Codigo/PFD/GPSMap.pde}

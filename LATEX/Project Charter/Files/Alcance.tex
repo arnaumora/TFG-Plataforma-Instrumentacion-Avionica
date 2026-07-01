@@ -1,0 +1,41 @@
+\chapter{Alcance}
+
+A continuación se presentan los paquetes de trabajo propuestos para llegar al objetivo final del proyecto.
+
+\begin{enumerate}[font=\bfseries]
+    \item \textbf{Estado del arte:} En este apartado se hará el estudio del estado del arte en instrumentación aviónica, sistemas AHRS y visualización de vuelo. Adicionalmente, análisis de las normativas aplicables.
+    
+    \item \textbf{Selección de componentes:} Esta sección estará centrada en la selección de los componentes del sistema físico, principalmente el controlador y los sensores, basado en el estudio del estado del arte.
+    
+    \item \textbf{Firmware y calibración:} Aquí se hará el desarrollo de la arquitectura del firmware en Arduino, la implementación de la calibración de los sensores y la lectura de los datos de los sensores.
+    
+    \item \textbf{Filtro de fusión de sensores (AHRS):} En este apartado se hará tanto la selección del mejor filtro en función de varios parámetros, como la implementación de este filtro para conseguir los parámetros deseados de los valores de los sensores.
+    
+    \item \textbf{Sistema de telemetría:} Desarrollo del sistema de transmisión inalámbrica entre el transmisor (microcontrolador + sensores) y el receptor (PC). 
+    
+    \item \textbf{Visualización PFD:} Implementación del Primary Flight Display completo con la distribución estándar Basic-T, marcada por la regulación correspondiente,  y desarrollada en el entorno Processing. 
+
+    \item \textbf{Diseño PCB:} Diseño del esquema eléctrico y la PCB que integre todos los módulos del sistema, microcontrolador y sensores seleccionados.
+    
+    \item \textbf{Integración del sistema y pruebas de validación:} Integración de todos los subsistemas desarrollados, hardware, firmware, telemetría y PFD. Documentación de los resultados obtenidos.
+    
+    \item \textbf{Redacción de la memoria:} Redacción de la memoria y documentación de todo el proceso, incluyendo todas las fuentes bibliográficas utilizadas, y siguiendo la plantilla proporcionada.
+\end{enumerate}
+
+\vspace{1em}
+
+\section{Actividades excluidas}
+
+Las siguientes actividades quedan fuera del alcance de este proyecto, aunque se pueden identificar como líneas de trabajo futuro.
+
+\begin{itemize}
+    \item Integración en una plataforma de vuelo real como un dron o aeronave. La plataforma está diseñada para operar en tierra de forma experimental.
+    
+    \item Representación del Flight Path Vector. Aunque sería una adición interesante para mostrar en el PFD, esta requeriría datos de viento y navegación que están fuera del alcance del proyecto.
+    
+    \item Certificación aeronáutica. Aunque se siga una serie de regulaciones para el desarrollo de algunos subsistemas, el resultado final está pensado para uso educativo y no sigue ningún tipo de certificación. 
+    
+    \item Integración de sistemas adicionales como radar meteorológico, TCAS, ADS-B o FMS.
+
+
+\end{itemize}

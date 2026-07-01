@@ -1,0 +1,47 @@
+\documentclass[11pt,a4paper,oneside]{report}
+
+% Cargar paquetes (mismos que la memoria)
+\input{../Common/packages.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                      CONFIGURACIÓN DEL DOCUMENTO
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Formato español para importes: separador de miles (.) y de decimales (,)
+\sisetup{group-separator={.}, group-minimum-digits=4}
+
+% Configuración de tablas (igual que la memoria)
+\captionsetup[table]{skip=10pt}
+\setlength{\tabcolsep}{12pt}
+\renewcommand{\arraystretch}{1.5}
+
+\setcounter{secnumdepth}{3}
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              PORTADA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{Files/00_Portada_Presupuesto}
+
+% Página en blanco después de portada
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\vfill
+\begin{center}
+    \textit{Intentionally left blank}
+\end{center}
+\vfill
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         CONTENIDO PRINCIPAL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\pagestyle{fancy}
+\pagenumbering{arabic}
+
+\input{Files/10_Presupuesto}
+
+\end{document}

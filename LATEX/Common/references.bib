@@ -1,0 +1,632 @@
+% ===== CAP. 1 -- INTRODUCCION ==============================================
+
+@book{faa_phak,
+  author       = {{Federal Aviation Administration}},
+  title        = {Pilot's Handbook of Aeronautical Knowledge},
+  edition      = {FAA-H-8083-25C},
+  publisher    = {U.S. Department of Transportation},
+  year         = {2023},
+  url          = {https://www.faa.gov/regulations_policies/handbooks_manuals/aviation/phak},
+  urldate      = {2025-05-01},
+}
+
+@book{collinson2011,
+  author       = {Collinson, Richard P. G.},
+  title        = {Introduction to Avionics Systems},
+  edition      = {3},
+  publisher    = {Springer},
+  year         = {2011},
+  isbn         = {978-94-007-0707-8},
+}
+
+
+% ===== CAP. 2 -- ESTADO DEL ARTE ==========================================
+
+% --- Plataformas low-cost y AHRS academico ---
+
+@article{dapper2018,
+  author       = {Dapper e Silva, Adilson and Mendonca, Cid Bendahan
+                  and Melo, Sandro},
+  title        = {A Wireless Sensor Network for Instrumentation and
+                  Control of a Small Fixed Wing UAV},
+  journal      = {Drones},
+  year         = {2018},
+  volume       = {2},
+  number       = {2},
+  pages        = {19},
+  doi          = {10.3390/drones2020019},
+  publisher    = {MDPI},
+}
+
+@article{das2025,
+  author       = {Das, Sujoy and Nandy, Sahil and Chakraborty, Sagnik
+                  and Singh, Jasbir and Halder, Tuhina},
+  title        = {Implementation of Complimentary Filter on MPU 6050},
+  journal      = {World Scientific News},
+  year         = {2025},
+  volume       = {199},
+  pages        = {218--234},
+  issn         = {2392-2192},
+}
+
+@article{koksal2019,
+  author       = {Koksal, Nihat and Jalalmaab, Mahdi and Fidan, Baris},
+  title        = {Adaptive Linear Quadratic Attitude Tracking Control
+                  of a Quadrotor UAV Based on IMU Sensor Data Fusion},
+  journal      = {Sensors},
+  year         = {2019},
+  volume       = {19},
+  number       = {1},
+  pages        = {46},
+  doi          = {10.3390/s19010046},
+  publisher    = {MDPI},
+}
+
+@article{feng2017,
+  author       = {Feng, Kaiqiang and Li, Jie and Zhang, Xiaoming
+                  and Shen, Chong and Bi, Yu and Zheng, Tao and Liu, Jun},
+  title        = {A New Quaternion-Based Kalman Filter for Real-Time
+                  Attitude Estimation},
+  journal      = {Sensors},
+  year         = {2017},
+  volume       = {17},
+  number       = {9},
+  pages        = {2146},
+  doi          = {10.3390/s17092146},
+  publisher    = {MDPI},
+}
+
+@article{sabatini2014,
+  author       = {Sabatini, Angelo Maria and Genovese, Vincenzo},
+  title        = {Stochastic Complementary Filter for Inertial-Aided
+                  Tracking of Body Segment Orientation},
+  journal      = {Sensors},
+  year         = {2014},
+  volume       = {14},
+  number       = {8},
+  pages        = {13324--13347},
+  doi          = {10.3390/s140813324},
+  publisher    = {MDPI},
+}
+
+@article{capello2021,
+  author       = {Capello, Elisa and others},
+  title        = {A Particle Filter Approach for Sensor Fault Detection
+                  Using a Duplex IMU},
+  journal      = {Sensors},
+  year         = {2021},
+  volume       = {21},
+  number       = {9},
+  pages        = {3066},
+  doi          = {10.3390/s21093066},
+  publisher    = {MDPI},
+}
+
+@article{xia2021,
+  author       = {Xia, Rui and others},
+  title        = {Complementary Filter Comparison: EKF vs Mahony},
+  journal      = {Micromachines},
+  year         = {2021},
+  volume       = {12},
+  number       = {11},
+  pages        = {1373},
+  doi          = {10.3390/mi12111373},
+  publisher    = {MDPI},
+}
+
+@article{narkhede2021,
+  author       = {Narkhede, Pushkar and others},
+  title        = {Cascaded Complementary Filter Architecture for
+                  Sensor Fusion},
+  journal      = {Sensors},
+  year         = {2021},
+  volume       = {21},
+  number       = {6},
+  pages        = {1937},
+  doi          = {10.3390/s21061937},
+  publisher    = {MDPI},
+}
+
+@article{cao2020,
+  author       = {Cao, Yue and others},
+  title        = {MPU9250 Disturbance Rejection AHRS},
+  journal      = {Sensors},
+  year         = {2020},
+  volume       = {20},
+  number       = {20},
+  pages        = {5870},
+  doi          = {10.3390/s20205870},
+  publisher    = {MDPI},
+}
+
+% --- Productos comerciales ---
+
+@online{garmin_g5,
+  author       = {{Garmin Ltd.}},
+  title        = {G5 Electronic Flight Instrument},
+  url          = {https://www.garmin.com/en-US/p/570665},
+  urldate      = {2025-05-01},
+}
+
+% --- Proyectos open-source ---
+
+@online{harinair_vario,
+  author       = {har-in-air},
+  title        = {ESP32\_IMU\_BARO\_GPS\_VARIO},
+  url          = {https://github.com/har-in-air/ESP32_IMU_BARO_GPS_VARIO},
+  urldate      = {2025-05-01},
+  note         = {Licencia GPL-3.0},
+}
+
+@online{avionicsduino,
+  author       = {{AvionicsDuino}},
+  title        = {EFIS -- Electronic Flight Instrument System},
+  url          = {https://avionicsduino.com},
+  urldate      = {2025-05-01},
+}
+
+@online{kriswiner_mpu9250,
+  author       = {Kriswiner, Kris},
+  title        = {MPU9250 library for ESP32/Teensy},
+  url          = {https://github.com/kriswiner/MPU9250},
+  urldate      = {2025-05-01},
+}
+
+
+% ===== CAP. 3 -- METODOLOGIA Y NORMATIVA ==================================
+
+@techreport{ac25_11b,
+  author       = {{Federal Aviation Administration}},
+  title        = {Advisory Circular AC 25-11B: Electronic Flight Displays},
+  institution  = {U.S. Department of Transportation},
+  year         = {2014},
+}
+
+@techreport{hfstd001b,
+  author       = {{Federal Aviation Administration}},
+  title        = {Human Factors Design Standard HF-STD-001B},
+  institution  = {William J. Hughes Technical Center},
+  year         = {2003},
+}
+
+@techreport{sae_as8034c,
+  author       = {{SAE International}},
+  title        = {AS8034C: Minimum Performance Standard for Airborne
+                  Multipurpose Electronic Displays},
+  year         = {2018},
+  organization = {SAE International},
+}
+
+@techreport{arinc429,
+  author       = {{Aeronautical Radio, Inc.}},
+  title        = {ARINC Specification 429 Part 1-17: Mark 33 Digital
+                  Information Transfer System (DITS)},
+  year         = {2004},
+  organization = {ARINC},
+}
+
+@misc{cfr25_1321,
+  title        = {14 CFR \S 25.1321 -- Arrangement and Visibility},
+  organization = {Code of Federal Regulations, Title 14, Part 25},
+  note         = {Federal Aviation Administration},
+}
+
+@misc{cfr25_1322,
+  title        = {14 CFR \S 25.1322 -- Flightcrew Alerting},
+  organization = {Code of Federal Regulations, Title 14, Part 25},
+  note         = {Federal Aviation Administration},
+}
+
+
+% ===== CAP. 4 -- DISENO HARDWARE ==========================================
+
+% --- Datasheets de componentes ---
+
+@manual{ps_mpu9250,
+  author       = {{InvenSense / TDK}},
+  title        = {MPU-9250 Product Specification Revision 1.1},
+  number       = {PS-MPU-9250A-01},
+  year         = {2016},
+  url          = {https://invensense.tdk.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_ak8963,
+  author       = {{AKM Semiconductor}},
+  title        = {AK8963 3-Axis Electronic Compass},
+  number       = {MS1356-E-02},
+  year         = {2013},
+  url          = {https://download.mikroe.com/documents/datasheets/ak8963c-datasheet.pdf},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_bmp280,
+  author       = {{Bosch Sensortec}},
+  title        = {BMP280 Digital Pressure Sensor Datasheet},
+  number       = {BST-BMP280-DS001},
+  year         = {2018},
+  url          = {https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/bmp280/},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_vl53l1x,
+  author       = {{STMicroelectronics}},
+  title        = {VL53L1X: World's Smallest Time-of-Flight Ranging Sensor},
+  year         = {2018},
+  url          = {https://www.st.com/resource/en/datasheet/vl53l1x.pdf},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_neo6,
+  author       = {{u-blox}},
+  title        = {NEO-6 u-blox 6 GPS Modules Data Sheet},
+  number       = {UBX-12017987-R02},
+  year         = {2014},
+  url          = {https://www.u-blox.com/en/product/neo-6-series},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_ld2410c,
+  author       = {{Hi-Link Electronic}},
+  title        = {HLK-LD2410C 24\,GHz Intelligent Human Presence
+                  Sensing Module Specification},
+  year         = {2022},
+  url          = {https://www.hlktech.com/en/Goods-553.html},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_nrf24l01p,
+  author       = {{Nordic Semiconductor}},
+  title        = {nRF24L01+ Single Chip 2.4\,GHz Transceiver
+                  Product Specification v1.0},
+  year         = {2008},
+  url          = {https://cdn.sparkfun.com/assets/3/d/8/5/1/nRF24L01P_Product_Specification_1_0.pdf},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_esp32s3,
+  author       = {{Espressif Systems}},
+  title        = {ESP32-S3 Series Datasheet v1.2},
+  year         = {2022},
+  url          = {https://www.espressif.com/sites/default/files/documentation/esp32-s3_datasheet_en.pdf},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_esp32c3,
+  author       = {{Espressif Systems}},
+  title        = {ESP32-C3 Series Datasheet},
+  year         = {2022},
+  url          = {https://www.espressif.com/en/products/socs/esp32-c3},
+  urldate      = {2025-05-01},
+}
+
+@manual{ds_njm12856,
+  author       = {{New Japan Radio (JRC)}},
+  title        = {NJM12856DL3 0.5\,A LDO Voltage Regulator Datasheet},
+  url          = {https://docs.rs-online.com/cdf2/A700000008957772.pdf},
+  urldate      = {2025-05-01},
+}
+
+@manual{nxp_i2c,
+  author       = {{NXP Semiconductors}},
+  title        = {UM10204: I2C-bus Specification and User Manual},
+  edition      = {Rev.~7.0},
+  year         = {2021},
+  url          = {https://www.nxp.com/docs/en/user-guide/UM10204.pdf},
+  urldate      = {2025-05-01},
+}
+
+@manual{mpu9250_regmap,
+  author       = {{InvenSense / TDK}},
+  title        = {MPU-9250 Register Map and Descriptions},
+  number       = {RM-MPU-9250A-00},
+  year         = {2015},
+  url          = {https://cdn.sparkfun.com/assets/learn_tutorials/5/5/0/MPU-9250-Register-Map.pdf},
+  urldate      = {2025-05-01},
+}
+
+% --- PCB y KiCad ---
+
+@manual{kicad_pcbnew,
+  author       = {{KiCad EDA}},
+  title        = {KiCad PCB Editor Reference Manual v9.0},
+  year         = {2025},
+  url          = {https://docs.kicad.org/9.0/en/pcbnew/pcbnew.pdf},
+  urldate      = {2025-05-01},
+}
+
+@online{mousebite_kicad,
+  author       = {Pieters, Achim},
+  title        = {mouse-bite.pretty -- KiCad footprint library for panelization},
+  url          = {https://github.com/AchimPieters/mouse-bite.pretty},
+  urldate      = {2025-05-01},
+}
+
+
+% ===== CAP. 5 -- FIRMWARE (Sensor fusion) =================================
+
+% --- Papers fundamentales del filtro ---
+
+@article{mahony2008,
+  author       = {Mahony, Robert and Hamel, Tarek and
+                  Pflimlin, Jean-Michel},
+  title        = {Nonlinear Complementary Filters on the Special
+                  Orthogonal Group},
+  journal      = {IEEE Transactions on Automatic Control},
+  year         = {2008},
+  volume       = {53},
+  number       = {5},
+  pages        = {1203--1218},
+  doi          = {10.1109/TAC.2008.919528},
+}
+
+@inproceedings{madgwick2011,
+  author       = {Madgwick, Sebastian O. H. and Harrison, Andrew J. L.
+                  and Vaidyanathan, Ravi},
+  title        = {Estimation of IMU and MARG Orientation Using a
+                  Gradient Descent Algorithm},
+  booktitle    = {Proc. IEEE Int. Conf. on Rehabilitation Robotics (ICORR)},
+  year         = {2011},
+  pages        = {1--7},
+  doi          = {10.1109/ICORR.2011.5975346},
+}
+
+% --- Estudios comparativos ---
+
+@inproceedings{cocoli2023,
+  author       = {Cocoli, Lorenzo and Badia, Leonardo},
+  title        = {A Comparative Analysis of Sensor Fusion Algorithms
+                  for Miniature IMU Measurements},
+  booktitle    = {Proc. IEEE ISITIA},
+  year         = {2023},
+  url          = {https://www.dei.unipd.it/~badia/papers/2023_07_ISITIA},
+  urldate      = {2025-05-01},
+}
+
+@article{uyar2024,
+  author       = {Uyar, Oguz},
+  title        = {Performance Evaluation of IMU Filtering Techniques
+                  in Yaw-Pitch-Roll Calculations},
+  journal      = {International Journal of Advanced Natural Sciences
+                  and Engineering Researches},
+  year         = {2024},
+  volume       = {8},
+  number       = {8},
+  pages        = {107--115},
+}
+
+@inproceedings{gui2015,
+  author       = {Gui, Pengfei and Tang, Liqiong and
+                  Mukhopadhyay, Subhas},
+  title        = {MEMS Based IMU for Tilting Measurement: Comparison of
+                  Complementary and Kalman Filter Based Data Fusion},
+  booktitle    = {Proc. IEEE ICINIS},
+  year         = {2015},
+  pages        = {74--77},
+}
+
+@online{olliw2013,
+  author       = {OlliW},
+  title        = {IMU Data Fusing: Complementary, Kalman, and Mahony Filter},
+  year         = {2013},
+  url          = {https://www.olliw.eu/2013/imu-data-fusing/},
+  urldate      = {2025-05-01},
+}
+
+@article{ren2010,
+  author       = {Ren, Zhongyuan and Ke, Xiazheng},
+  title        = {Particle Filter Data Fusion Enhancements for
+                  MEMS-IMU/GPS},
+  journal      = {Intelligent Information Management},
+  year         = {2010},
+  volume       = {2},
+  pages        = {417--421},
+  doi          = {10.4236/iim.2010.27051},
+}
+
+% --- Navegacion inercial ---
+
+@techreport{woodman2007,
+  author       = {Woodman, Oliver J.},
+  title        = {An Introduction to Inertial Navigation},
+  institution  = {University of Cambridge, Computer Laboratory},
+  year         = {2007},
+  number       = {UCAM-CL-TR-696},
+  url          = {https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-696.pdf},
+  urldate      = {2025-05-01},
+}
+
+@book{grewal2015,
+  author       = {Grewal, Mohinder S. and Andrews, Angus P.},
+  title        = {Kalman Filtering: Theory and Practice Using MATLAB},
+  edition      = {4},
+  publisher    = {John Wiley \& Sons},
+  year         = {2015},
+  isbn         = {978-1-118-85121-0},
+}
+
+@book{titterton2004,
+  author       = {Titterton, David and Weston, John},
+  title        = {Strapdown Inertial Navigation Technology},
+  edition      = {2},
+  publisher    = {IET},
+  year         = {2004},
+  isbn         = {978-0-86341-358-2},
+}
+
+% --- Calibracion del magnetometro ---
+
+@article{renaudin2010,
+  author       = {Renaudin, Valerie and Afzal, Muhammad Haris
+                  and Lachapelle, Gerard},
+  title        = {Complete Triaxis Magnetometer Calibration in the
+                  Magnetic Domain},
+  journal      = {Journal of Sensors},
+  year         = {2010},
+  volume       = {2010},
+  pages        = {Article 967245},
+  doi          = {10.1155/2010/967245},
+}
+
+@manual{st_an5192,
+  author       = {{STMicroelectronics}},
+  title        = {AN5192: Tilt-Compensated Electronic Compass Design
+                  Using ST Sensors},
+  year         = {2018},
+  note         = {Application Note},
+}
+
+@online{noaa_wmm2025,
+  author       = {{NOAA / NCEI}},
+  title        = {World Magnetic Model 2025 (WMM2025)},
+  year         = {2024},
+  url          = {https://www.ncei.noaa.gov/products/world-magnetic-model},
+  urldate      = {2025-05-01},
+}
+
+% --- Formula barometrica ISA ---
+
+@techreport{icao_isa,
+  author       = {{ICAO}},
+  title        = {Manual of the ICAO Standard Atmosphere},
+  number       = {Doc 7488/3},
+  edition      = {3},
+  year         = {1993},
+  organization = {International Civil Aviation Organization},
+  note         = {Tambien publicada como ISO 2533:1975},
+}
+
+% --- Procesamiento de senal (radar subgate interpolation) ---
+
+@book{smith_dsp,
+  author       = {Smith, Steven W.},
+  title        = {The Scientist and Engineer's Guide to Digital Signal
+                  Processing},
+  publisher    = {California Technical Publishing},
+  year         = {1997},
+  url          = {https://www.dspguide.com/},
+  urldate      = {2025-05-01},
+}
+
+
+% ===== CAP. 6 -- TELEMETRIA ================================================
+
+@online{aim_arinc429,
+  author       = {{AIM GmbH}},
+  title        = {ARINC 429 Tutorial v2.2},
+  year         = {2019},
+  url          = {https://www.aim-online.com/},
+  urldate      = {2025-05-01},
+}
+
+
+% ===== CAP. 7 -- PRIMARY FLIGHT DISPLAY ====================================
+
+@online{processing_ref,
+  author       = {{Processing Foundation}},
+  title        = {Processing Reference},
+  year         = {2024},
+  url          = {https://processing.org/reference},
+  urldate      = {2025-05-01},
+}
+
+% --- Proyeccion Mercator ---
+
+@book{snyder1987,
+  author       = {Snyder, John P.},
+  title        = {Map Projections: A Working Manual},
+  series       = {USGS Professional Paper 1395},
+  publisher    = {U.S. Government Printing Office},
+  year         = {1987},
+  pages        = {38--47},
+}
+
+% --- Tiles cartograficos ---
+
+@online{icgc_tiles,
+  author       = {{Institut Cartografic i Geologic de Catalunya}},
+  title        = {Servei de mapes base i ortofoto},
+  url          = {https://www.icgc.cat/},
+  urldate      = {2025-05-01},
+}
+
+
+% ===== LIBRERIAS ARDUINO ===================================================
+
+@online{lib_rf24,
+  author       = {TMRh20 and Avamander},
+  title        = {RF24 Library for Arduino},
+  url          = {https://github.com/nRF24/RF24},
+  urldate      = {2025-05-01},
+}
+
+@online{lib_vl53l1x,
+  author       = {{Pololu Corporation}},
+  title        = {VL53L1X Library for Arduino},
+  url          = {https://github.com/pololu/vl53l1x-arduino},
+  urldate      = {2025-05-01},
+}
+
+@online{lib_myld2410,
+  author       = {iavorvel},
+  title        = {MyLD2410: Arduino Library for HLK-LD2410},
+  url          = {https://github.com/iavorvel/MyLD2410},
+  urldate      = {2025-05-01},
+}
+
+@online{lib_bmp280,
+  author       = {{Adafruit Industries}},
+  title        = {Adafruit BMP280 Library for Arduino},
+  url          = {https://github.com/adafruit/Adafruit_BMP280_Library},
+  urldate      = {2025-05-01},
+}
+
+@online{lib_tinygps,
+  author       = {Hart, Mikal},
+  title        = {TinyGPSPlus: A Small GPS Library for Arduino},
+  url          = {https://github.com/mikalhart/TinyGPSPlus},
+  urldate      = {2025-05-01},
+}
+
+% --- ESP32 NVS ---
+
+@online{esp_nvs,
+  author       = {{Espressif Systems}},
+  title        = {ESP-IDF Programming Guide: Non-Volatile Storage (NVS)},
+  year         = {2024},
+  url          = {https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/storage/nvs_flash.html},
+  urldate      = {2025-05-01},
+}
+
+@article{liu1973scheduling,
+  author  = {Liu, C. L. and Layland, J. W.},
+  title   = {Scheduling Algorithms for Multiprogramming in a Hard-Real-Time Environment},
+  journal = {Journal of the ACM},
+  year    = {1973},
+  volume  = {20},
+  number  = {1},
+  pages   = {46--61},
+  doi     = {10.1145/321738.321743}
+}
+
+@misc{dir_rohs,
+  author       = {{Parlamento Europeo y Consejo de la Unión Europea}},
+  title        = {Directiva 2011/65/UE sobre restricciones a la utilización de
+                  determinadas sustancias peligrosas en aparatos eléctricos y
+                  electrónicos (refundición)},
+  year         = {2011},
+  note         = {Diario Oficial de la Unión Europea, L 174, 1.7.2011, pp. 88-110},
+  url          = {https://eur-lex.europa.eu/eli/dir/2011/65/oj},
+  urldate      = {2026-06-18},
+}
+
+@misc{dir_raee,
+  author       = {{Parlamento Europeo y Consejo de la Unión Europea}},
+  title        = {Directiva 2012/19/UE sobre residuos de aparatos eléctricos y
+                  electrónicos (RAEE)},
+  year         = {2012},
+  note         = {Transpuesta al ordenamiento español por el Real Decreto
+                  110/2015, de 20 de febrero},
+  url          = {https://eur-lex.europa.eu/eli/dir/2012/19/oj},
+  urldate      = {2026-06-18},
+}

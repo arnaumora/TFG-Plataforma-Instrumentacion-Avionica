@@ -1,0 +1,33 @@
+Guia de Conexion: Telemetria en el Emulador de Android
+
+
+Paso 1: Conectar el PC al Wi-Fi de la placa
+1. Enciende la placa (el ESP32).
+2. En tu ordenador Windows, busca las redes Wi-Fi.
+3. Conectate a la red llamada "FlightData_Network" (la contrasena es 12345678).
+4. Es normal si el ordenador dice "Sin internet". Ignora la advertencia y manten la conexion.
+
+Paso 2: Buscar tu codigo de seguridad
+El emulador de Android tiene un bloqueo invisible. Necesitas una "llave" para dejar pasar los datos.
+1. Abre el Explorador de archivos de Windows (una carpeta cualquiera).
+2. Ve a la ruta de tu usuario principal, normalmente es: C:\Users\TuNombreDeUsuario\
+3. Busca un archivo que se llama exactamente ".emulator_console_auth_token".
+4. Abre ese archivo haciendo doble clic y eligiendo el "Bloc de notas".
+5. Dentro veras un codigo largo de letras y numeros. Copia ese codigo.
+
+Paso 3: Abrir la consola y entrar al emulador
+1. Abre tu emulador de Android (el telefono virtual) y dejalo encendido en la pantalla principal.
+2. En tu ordenador, pulsa la tecla Windows, escribe "cmd" y pulsa Enter. Se abrira una ventana negra.
+3. Escribe este comando y pulsa Enter: telnet localhost 5554
+4. El sistema te pedira que te identifiques. Escribe la palabra "auth", deja un espacio, y pega el codigo que copiaste en el Paso 2. 
+   Te tiene que quedar algo parecido a esto: auth abc123def456xyz
+5. Pulsa Enter. El sistema te respondera con un "OK".
+
+Paso 4: Abrir el tunel de datos
+1. En esa misma ventana negra, despues del "OK", escribe este comando exacto:
+   redir add udp:12345:12345
+2. Pulsa Enter. Te respondera con otro "OK". Esto significa que el puente entre tu ordenador y el emulador ya esta abierto.
+
+Paso 5: Iniciar la aplicacion
+1. Ve al emulador de Android y abre la aplicacion de vuelo.
+2. Los datos deberian empezar a entrar inmediatamente y veras "LIVE TELEMETRY" en la pantalla.

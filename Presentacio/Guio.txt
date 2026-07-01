@@ -1,0 +1,114 @@
+3. Guion de la presentacion (lo que decir en cada diapositiva)
+Esta pensado para unos 20 minutos en primera persona, registro hablado pero formal. Los tiempos son orientativos.
+Diapositiva 1 - Portada (~30 s)
+
+"Buenos dias. Soy Arnau [apellido] y presento mi Trabajo de Fin de Grado, titulado 'Diseno e implementacion de una plataforma experimental de instrumentacion avionica', dirigido por Juan Mon y Javier Gago. El objetivo, en una frase, es construir una plataforma educativa y de bajo coste que recorra toda la cadena de instrumentacion de vuelo, desde el sensor hasta la pantalla."
+Diapositiva 2 - Indice (~20 s)
+
+"El recorrido sera el siguiente: motivacion y objetivo, arquitectura, los tres subsistemas (hardware, firmware y software), la telemetria, la validacion frente a requisitos, y las conclusiones."
+Diapositiva 3 - Motivacion (~1 min)
+
+"Hoy existen dos mundos que no se tocan. Por un lado, el ecosistema de drones (Betaflight, iNav) tiene firmware de vuelo muy maduro, pero son sistemas con millones de lineas de codigo y pantallas que no siguen la normativa aeronautica. Por otro, en el aula se usan simuladores de vuelo sin hardware real. Falta un puente: una plataforma fisica, abierta y asequible, que muestre como funciona de verdad la instrumentacion siguiendo la filosofia de la aviacion. Esa es la motivacion."
+Diapositiva 4 - Objetivo (~45 s)
+
+"El objetivo es disenar e implementar esa plataforma completa: capturar las magnitudes de vuelo con sensores, transmitirlas de forma inalambrica con un formato aeronautico, y representarlas en un Primary Flight Display conforme a la disposicion Basic-T. Todo por debajo de 100 euros de materiales y con software abierto."
+Diapositiva 5 - Requisitos (~1 min)
+
+"Aunque la plataforma no requiere certificacion, los requisitos se han derivado de normas aeronauticas reales para que sean medibles. Hay requisitos funcionales, de rendimiento, de coste y normativos. Los de rendimiento clave: latencia extremo a extremo por debajo de 200 ms, refresco del PFD de al menos 30 FPS, actitud dentro de 3 grados y posicionamiento GNSS mejor de 2,5 m. Sobre estos numeros se hara la validacion al final."
+Diapositiva 6 - Arquitectura (~1 min)
+
+"El sistema se parte en tres bloques. Un nodo transmisor con todos los sensores y un ESP32-S3, que adquiere y fusiona las medidas. Un enlace de radio que lleva la telemetria. Y un nodo receptor con un ESP32-C3 que entrega los datos al PC por USB, donde Processing dibuja el PFD. La informacion fluye en un sentido: del sensor a la pantalla."
+Diapositiva 7 - Decisiones de diseno (NUEVA, ~1 min 15 s)
+
+"Antes de entrar en el hardware, justifico tres decisiones de arquitectura. Primero, por que dos nodos y no uno: porque refleja la arquitectura real de una aeronave, da movilidad al nodo de sensores frente al PC fijo, y anade un enlace inalambrico con valor docente. Segundo, el enlace: se descartaron cable, WiFi-UDP y Bluetooth, y se eligio un transceptor RF en 2,4 GHz por baja latencia, alcance suficiente y bajo coste. Y tercero, la telemetria usa la capa logica de ARINC 429, el bus de datos mas extendido en aviacion, por trazabilidad con la practica real y por valor docente. Un detalle que cierra el diseno: el payload de 32 bytes de la radio equivale exactamente a 8 palabras ARINC de 32 bits, asi que no hace falta fragmentar."
+Diapositiva 8 - Hardware: la PCB (~1 min)
+
+"El nodo transmisor se ha disenado como PCB propia de dos capas en KiCad, fabricada por JLCPCB. Integra el ESP32-S3, la IMU MPU-9250 con magnetometro, el barometro BMP280, el GNSS NEO-6M, el sensor de distancia VL53L1X, un radar y el modulo de radio NRF24 con amplificador. La alimentacion entra por USB-C y un regulador LDO da el rail de 3,3 V."
+Diapositiva 9 - La placa fabricada (~45 s)
+
+"Aqui esta la placa ya fabricada y montada. [Senala] Esta es la cara superior, esta la inferior. Funciono a la primera tras la verificacion del bus I2C y de los raIles de alimentacion."
+Diapositiva 10 - Seleccion del filtro de fusion (NUEVA, ~1 min 15 s)
+
+"Para estimar la orientacion hay que fusionar acelerometro, giroscopio y magnetometro. Compare las opciones: el filtro complementario es muy barato pero no corrige la deriva del giroscopio; Madgwick da precision similar pero sin ajuste independiente del transitorio; EKF y UKF tienen mas coste de computo del necesario aqui; y el filtro de particulas, aunque preciso, es inviable en tiempo real sobre un ESP32. Se eligio Mahony porque compensa activamente la deriva del giroscopio con su termino integral PI, tiene coste de computo bajo apto para el ESP32, y permite ajustar la respuesta con dos parametros. Varios estudios sobre ESP32 respaldan esta eleccion."
+Diapositiva 11 - Firmware: fusion sensorial (~1 min 15 s)
+
+"En la implementacion del Mahony, los parametros son Kp = 3,0 y Ki = 1,0, con la fusion corriendo a 100 Hz. Para evitar el retardo de convergencia al arrancar, el cuaternion se inicializa de forma analitica a partir del acelerometro y el magnetometro, en lugar de partir de cero. Asi, desde el primer instante la actitud es valida y el termino integral solo tiene que seguir la deriva lenta del giroscopio."
+Diapositiva 12 - Telemetria ARINC 429 (~1 min 15 s)
+
+"La telemetria viaja codificada en palabras ARINC 429 de 32 bits, con sus etiquetas, codificacion BNR, bit de paridad y campo de estado. Como una sola palabra no basta para todos los parametros, un planificador reparte los campos entre paquetes: la actitud va a 20 Hz, el barometro, el radar y la distancia a 10 Hz, y el GPS y el estado a 5 Hz. Cada paquete son 8 palabras, justo los 32 bytes de la radio."
+Diapositiva 13 - El PFD Basic-T (~1 min)
+
+"La visualizacion sigue la disposicion Basic-T, exigida por la AC-25-11B: horizonte artificial en el centro, velocidad a la izquierda, altitud a la derecha y rumbo debajo, con la trepada y la proximidad integradas. Esta distribucion aprovecha el barrido visual natural del piloto. Esta hecho en Processing y refresca por encima de 30 FPS."
+Diapositiva 14 - Navegacion: mapa (~45 s)
+
+"En una pantalla aparte hay una vista de mapa con la posicion GNSS, usando teselas cartograficas offline del ICGC. Se mantiene separada del Basic-T para no romper la disposicion normativa."
+Diapositiva 15 - Validacion: cumplimiento (~1 min 15 s)
+
+"Esta es la tabla de cumplimiento. Cada requisito de rendimiento se contrasta con el resultado medido o acotado. La latencia en el peor caso sale en torno a 85 ms, frente a los 200 de limite. La actitud, dentro de 1,8 grados en estatico. El GNSS, con un CEP50 de 1 metro, mejor que los 2,5 exigidos. Y el alcance del enlace, del orden de 100 m, muy por encima del uso en laboratorio. Todos los requisitos se cumplen."
+Diapositiva 16 - Validacion: evidencia experimental (~1 min)
+
+"Aqui estan las cifras de merito juntas. Actitud: 1,8 grados de error maximo. GNSS: 1 metro de CEP50. Latencia: del orden de 85 ms. Y alcance: en torno a 100 m. Son los numeros que respaldan la tabla anterior."
+Diapositiva 17 - Conclusiones (~1 min)
+
+"Como conclusiones: se ha construido una plataforma completa y funcional que recorre toda la cadena, del sensor al PFD, siguiendo criterios aeronauticos reales, por debajo de 100 euros y con software abierto. Cumple todos los requisitos de rendimiento planteados, y como herramienta docente permite estudiar fusion sensorial, codificacion aeronautica y enlaces inalambricos sobre hardware real."
+Diapositiva 18 - Trabajo futuro (~45 s)
+
+"De cara al futuro: descarga online de teselas de mapa, ampliar la caracterizacion del enlace con medidas de alcance reales, e incorporar el radar como fuente de proximidad una vez estabilizada su lectura."
+Diapositiva 19 - Gracias / demo (~30 s + demo)
+
+"Con esto termino. Gracias por su atencion. Si lo desean, puedo mostrar el sistema funcionando. Quedo a su disposicion para preguntas."
+
+4. Lo que tienes que dominar y preguntas probables del tribunal
+Prioridad maxima
+P1. El dato de GNSS y la figura de la memoria.
+
+Esta es la pregunta de mayor riesgo. Si alguien abre la memoria y ve el scatter con 11,45 m al lado de un pie que dice 1,00 m, te lo va a preguntar. Respuesta honesta y preparada:
+
+"La precision estatica del GNSS es del orden de 1 metro de CEP50, holgadamente dentro de los 2,5 metros de la hoja de datos del NEO-6M y del requisito. Hay una incoherencia en una de las figuras de la memoria: la grafica que quedo incluida procede de un registro que no era una captura estatica limpia. La traza que se ve deambulando corresponde a la convergencia inicial y a movimiento durante la toma, no al ruido estatico, y por eso su leyenda da un CEP inflado. La cifra representativa en estatico es la que consta en el texto y en la tabla de cumplimiento, 1 metro. Lo correcto habria sido incluir la grafica estatica depurada."
+
+Claves: reconocelo, no defiendas que 11,45 m es el resultado estatico, y reconduce al hecho de que el requisito (2,5 m) se cumple con margen. Lo que demuestra madurez es admitir el desliz de figura sin que se tambalee la conclusion. No digas que la nube de 0,46 m es la buena tampoco: son solo 9 fijaciones y esta dominada por la cuantizacion. La cifra de consenso es 1 m.
+Ten claro tambien el porque tecnico: el NEO-6M sin correcciones diferenciales da del orden de 2,5 m CEP; en estatico con buena vista de cielo y promediado se baja a aproximadamente 1 m. La retIcula que se ve en las graficas es la cuantizacion de la telemetria (unos 0,42 m por bit), no ruido del receptor.
+P2. "Por que Ki = 1,0? Es un valor muy alto para un Mahony."
+
+Tienen razon en que es agresivo: en la literatura Ki suele rondar 0,1. Respuesta:
+
+"Es un valor mas alto de lo habitual, elegido de forma empirica buscando un punto de funcionamiento sobreamortiguado en este montaje concreto. Funciona bien por una razon: el cuaternion se inicializa de forma analitica desde acelerometro y magnetometro, asi que el filtro no arranca lejos de la solucion y el termino integral no tiene que corregir un error grande, solo seguir la deriva lenta del giroscopio. El resultado se valida con el error de actitud de 1,8 grados en estatico, que confirma que el punto de operacion es estable."
+
+Si insisten en que un Ki alto puede inyectar ruido del magnetometro en la estimacion: reconoce el compromiso y di que en interior el rumbo se degrada por distorsion magnetica (cosa que ya documentas), pero que en cabeceo y alabeo, que es lo que mide el requisito, el comportamiento es estable.
+Preguntas probables (con respuesta breve)
+El radar HLK-LD2410C: lo implementaste pero no lo usas para la proximidad. Por que?
+
+"El radar esta integrado de extremo a extremo y transmite en la telemetria, pero su salida es una clasificacion por puertas de distancia, no una medida metrica estable. Por eso la fuente activa del indicador de proximidad es el sensor de tiempo de vuelo VL53L1X, que da error de menos de 2 cm frente a cinta metrica. El radar queda como segunda fuente comparativa y con valor docente. Esta justificado asi en la memoria."
+El rumbo lo llamas magnetico, pero aplicas la declinacion. No es entonces rumbo verdadero?
+
+"La fuente fisica es el magnetometro, por eso se etiqueta como magnetico. Se le aplica la declinacion local como constante (1,95 grados), de modo que el valor mostrado se aproxima al rumbo verdadero. La nomenclatura sigue el origen del sensor; el ajuste de declinacion es una correccion fija."
+Como mides la perdida de paquetes?
+
+"Lo que tengo es un indicador de salud del enlace a 5 Hz, derivado de la secuencia de la palabra de estado, no una medida estadistica rigurosa de tasa de perdida. Permite verificar que el enlace esta vivo. Una caracterizacion cuantitativa del enlace es parte del trabajo futuro." (Importante: no lo vendas como una medida de perdida validada; la memoria es honesta en esto y tu tambien debes serlo.)
+La latencia de 85 ms, la has medido?
+
+"Es una cota analitica del peor caso, sumando los retardos de transporte de cada etapa de la cadena. La latencia tipica es menor. Queda muy por debajo del limite de 200 ms del requisito."
+Y el alcance de 100 m?
+
+"Procede de la hoja de datos del modulo con amplificador y del margen de enlace, justificado analiticamente. El uso real en laboratorio es de unos pocos metros. Una prueba de alcance real es trabajo futuro."
+Por que ARINC 429 y no una simple estructura de datos propia?
+
+"Por tres motivos: trazabilidad con una norma aeronautica real, valor docente (el alumno trabaja con etiquetas, codificacion BNR, paridad y campo de estado), y porque la norma ya ofrece una palabra estructurada con los campos necesarios, sin disenar un formato desde cero. Y encaja: 8 palabras de 32 bits son exactamente los 32 bytes del payload de la radio." Si preguntan si reproduces ARINC fisico: "No, la capa fisica de ARINC, la senalizacion diferencial sobre par trenzado, es imposible aqui porque el transporte es por radio. Lo que reutilizo es la capa logica."
+Por que dos microcontroladores y no uno conectado por cable?
+
+"Por movilidad del nodo de sensores, por reflejar la arquitectura real de una aeronave y por el valor docente del enlace inalambrico. Cumpliendo igualmente latencia y alcance."
+Por que NRF24 y no WiFi o BLE?
+
+"WiFi-UDP tiene mas consumo y el espectro suele estar saturado en entornos academicos; Bluetooth Classic tiene mas latencia y emparejamiento complejo; BLE esta pensado para baja tasa, no para flujo continuo de telemetria estructurada. El transceptor RF en 2,4 GHz da baja latencia, alcance suficiente y bajo coste."
+La calibracion del magnetometro, como la hiciste?
+
+"Con captura de minimos y maximos en los tres ejes para corregir el offset de hierro duro. Un detalle importante: la calibracion debe hacerse con todos los perifericos activos y la radio transmitiendo, porque hacerla solo con la IMU encendida da offsets erroneos."
+Coste por debajo de 100 euros, lo sostienes?
+
+"Si, el coste de materiales para replicar la plataforma queda por debajo de 100 euros. El presupuesto completo, con personal y amortizacion de equipos, esta en el documento de presupuesto, que hoy no presento por indicacion del tutor."
+Esto necesitaria certificacion para volar?
+
+"No, es una plataforma experimental y educativa, sin pretension de certificacion ni de hardware ni de software. Se han seguido las directrices de las normas (AC-25-11B, HF-STD-001B, SAE AS8034C, 14 CFR 25.1321/1322) con fines academicos, no para certificar."
+Si tuvieras mas tiempo, que mejorarias?
+
+Buena oportunidad para mostrar criterio: "Repetiria la caracterizacion de GNSS con una captura estatica larga y depurada para cerrar el dato con una grafica limpia, anadiria medidas reales de alcance y de tasa de perdida del enlace, e incorporaria el radar como fuente de proximidad. Tambien la descarga online de mapas."

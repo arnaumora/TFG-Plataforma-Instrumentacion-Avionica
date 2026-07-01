@@ -1,0 +1,140 @@
+\chapter{Calendario}
+
+El proyecto tiene una duración estimada de 16 semanas. La planificación se organiza en quincenas para facilitar el seguimiento.
+
+
+\section{Descripción de tareas y dependencias}
+
+Las tareas del alcance se han agrupado en 6 paquetes de trabajo principales.
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+
+\item[P1 -- Gestión y memoria (S1--S8)]
+Revisión bibliográfica (estado del arte y normativa) y redacción continua de la memoria. Culmina con la revisión final, entrega y preparación de la defensa. Tarea continua que no tiene dependencias previas.
+
+\item[P2 -- Firmware embebido (S1--S4)]
+Desarrollo y programación del firmware en el microcontrolador. Incluye la adquisición de datos de los diversos sensores (inerciales, presión, posicionamiento), la evaluación e implementación de un algoritmo de fusión de sensores (filtro AHRS) para la estimación de actitud y la calibración de los componentes.
+
+\item[P3 -- Telemetría inalámbrica (S1--S3)]
+Configuración de los módulos de radiofrecuencia y diseño del protocolo de comunicación. Consiste en la estructuración, empaquetado y transmisión de todos los datos calculados en el receptor para ser recibidos en el receptor para ser mostrados.
+
+\item[P4 -- Primary Flight Display (S1--S4)]
+Programación de la interfaz gráfica, PFD, replicando la disposición aeronáutica estándar (como la Basic-T). Abarca el diseño visual de los instrumentos y la conexión con los datos del nodo transmisor.
+
+\item[P5 -- Diseño de la PCB (S3--S6)]
+Diseño electrónico de la placa base (\textit{carrier board}). Comprende la creación del esquema eléctrico, el enrutado de pistas (\textit{layout}), la gestión de la alimentación y la verificación de reglas eléctricas y de diseño para la correcta fabricación.
+
+\item[P6 -- Integración y pruebas (S5--S7)]
+Ensamblaje final de todos los subsistemas de hardware y software. Incluye la ejecución de pruebas para validar parámetros como la precisión del rumbo, la latencia del sistema, la integridad de la conexión inalámbrica y el rendimiento global del conjunto.
+
+\end{description}
+
+
+\section{Hitos principales}
+
+\begin{table}[H]
+\centering
+\caption{Hitos del proyecto}
+\label{tab:hitos}
+\small
+\begin{tabularx}{\textwidth}{l X l}
+\toprule
+\textbf{Hito} & \textbf{Criterio de éxito} & \textbf{Fecha} \\
+\midrule
+M1 & Project Charter & S1 \\
+M2 & Firmware completo, con todos los sensores integrados & S4 \\
+M3 & Diseño PCB completo, preparado para fabricación & S6 \\
+M4 & Sistema integrado: PFD mostrando todos los datos reales en tiempo real & S7 \\
+M5 & Memoria entregada & S8 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\newpage
+\section{Diagrama de Gantt}
+
+El diagrama siguiente muestra la planificación temporal. Las tareas en verde están completadas antes del inicio formal del TFG; las tareas en azul están pendientes; los rombos indican hitos.
+
+\vspace{1em}
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{ganttchart}[
+    hgrid,
+    vgrid,
+    x unit=1.6cm,
+    y unit title=0.6cm,
+    y unit chart=0.55cm,
+    title height=1,
+    bar height=0.6,
+    bar label font=\scriptsize,
+    group label font=\scriptsize\bfseries,
+    milestone label font=\scriptsize\bfseries,
+    title label font=\scriptsize\bfseries,
+    bar/.append style={fill=blue!40},
+    group/.append style={fill=gray!30},
+    group peaks tip position=0,
+    group peaks height=0,
+    group peaks width=0,
+    milestone/.append style={fill=red!70, inner sep=1.2pt},
+]{1}{8}
+
+    \gantttitle{Mar}{2} \gantttitle{Abr}{2} \gantttitle{May}{2} \gantttitle{Jun}{2} \\
+    \gantttitlelist{1,...,8}{1} \\
+
+    % --- Grupo 1: Gestión ---
+    \ganttgroup{P1 · Gestión y memoria}{1}{8} \\
+    \ganttbar{P1.1 Project Charter}{1}{1} \\
+    \ganttbar{P1.2 Revisión bibliográfica}{1}{6} \\
+    \ganttbar{P1.3 Redacción memoria}{2}{8} \\
+    \ganttbar{P1.4 Revisión final y entrega}{7}{8} \\
+
+    % --- Grupo 2: Firmware ---
+    \ganttgroup{P2 · Firmware embebido}{1}{4} \\
+    \ganttbar[bar/.append style={fill=green!40}]{P2.1 Arquitectura modular}{1}{1} \\
+    \ganttbar[bar/.append style={fill=green!40}]{P2.2 Calibración IMU}{1}{1} \\
+    \ganttbar[bar/.append style={fill=green!40}]{P2.3 Filtro AHRS}{1}{1} \\
+    \ganttbar{P2.4 Calib. magnetómetro}{1}{2} \\
+    \ganttbar{P2.5 Integración barómetro}{2}{3} \\
+    \ganttbar{P2.6 Integración GNSS}{3}{4} \\
+    \ganttbar{P2.7 Validación firmware}{4}{4} \\
+
+    % --- Grupo 3: Telemetría ---
+    \ganttgroup{P3 · Telemetría inalámbrica}{1}{3} \\
+    \ganttbar[bar/.append style={fill=green!40}]{P3.1 Configuración enlace}{1}{1} \\
+    \ganttbar[bar/.append style={fill=green!40}]{P3.2 Protocolo de paquetes}{1}{1} \\
+    \ganttbar{P3.3 Nuevos datos (baro/GNSS)}{2}{3} \\
+    \ganttbar[bar/.append style={fill=green!40}]{P3.4 Validación enlace}{1}{1} \\
+
+    % --- Grupo 4: PFD ---
+    \ganttgroup{P4 · PFD (Processing)}{1}{4} \\
+    \ganttbar[bar/.append style={fill=green!40}]{P4.1 Instrumentos Basic-T}{1}{1} \\
+    \ganttbar[bar/.append style={fill=green!40}]{P4.2 APK Android}{1}{1} \\
+    \ganttbar{P4.3 Integración datos reales}{3}{4} \\
+    \ganttbar{P4.4 Validación visual}{4}{4} \\
+
+    % --- Grupo 5: PCB ---
+    \ganttgroup{P5 · Diseño PCB}{3}{6} \\
+    \ganttbar{P5.1 Esquema eléctrico}{3}{4} \\
+    \ganttbar{P5.2 Layout PCB}{4}{5} \\
+    \ganttbar{P5.3 Revisión DRC}{5}{6} \\
+
+    % --- Grupo 6: Integración ---
+    \ganttgroup{P6 · Integración y pruebas}{5}{7} \\
+    \ganttbar{P6.1 Integración subsistemas}{5}{6} \\
+    \ganttbar{P6.2 Pruebas AHRS}{6}{7} \\
+    \ganttbar{P6.3 Documentación resultados}{6}{7} \\
+
+    % --- Hitos ---
+    \ganttmilestone{M1 · Project Charter}{1} \\
+    \ganttmilestone{M2 · Firmware completo}{4} \\
+    \ganttmilestone{M3 · PCB finalizada}{6} \\
+    \ganttmilestone{M4 · Sistema validado}{7} \\
+    \ganttmilestone{M5 · Entrega y defensa}{8} \\
+
+\end{ganttchart}
+}%
+\caption{Diagrama de Gantt del proyecto}
+\label{fig:gantt}
+\end{figure}

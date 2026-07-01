@@ -1,0 +1,117 @@
+%!TEX root = ../main.tex
+
+\chapter{Requisitos del sistema}
+\label{ch:requisitos}
+
+A partir del estado del arte presentado en el \cref{ch:estado_del_arte} y del
+alcance definido en la \cref{sec:alcance}, en este capítulo se definen los
+requisitos que el sistema debe cumplir. Los requisitos se organizan en cuatro
+categorías: funcionales (RF), de rendimiento (RP), restricciones del proyecto
+(RC) y normativos (RN). Para justificar estos requisitos, en cada requisito se incluye una o más referencias, ya sean normas aeronáuticas, alguna sección del estado del arte, o una decisión del proyecto; las cuales apoyan la decisión tomada para ese requisito.
+
+Es importante recordar que para los requisitos de rendimiento, como no se pretende llegar a certificación aeronáutica, los umbrales definidos son solo orientativos, son coherentes con la norma, pero no son de cumplimiento estricto. Dicho esto, los valores son definidos para disponer de criterios objetivos a los que hacer referencia en las secciones de validación.
+
+
+\section{Requisitos funcionales}
+\label{sec:req_funcionales}
+
+Los requisitos funcionales describen las capacidades que el sistema debe
+proporcionar. Se derivan principalmente de la disposición estándar Basic-T del PFD definida en \cite{ac25_11b}, complementada con funcionalidades adicionales añadidas para reforzar la finalidad educativa de la plataforma.
+
+\begin{table}[H]
+    \centering
+    \caption{Requisitos funcionales del sistema}
+    \label{tab:req_funcionales}
+    \begin{tabularx}{\linewidth}{l X l}
+        \toprule
+        \textbf{ID} & \textbf{Descripción} & \textbf{Fuente} \\
+        \midrule
+        RF01 & Estimar la actitud (cabeceo y alabeo) de la plataforma en tiempo real. & \cite{ac25_11b} \\
+        RF02 & Estimar el rumbo magnético de la plataforma en tiempo real. & \cite{ac25_11b} \\
+        RF03 & Calcular la altitud respecto al nivel del mar a partir de la presión atmosférica. & \cite{icao_isa}, \cite{ac25_11b} \\
+        RF04 & Estimar la velocidad vertical (tasa de ascenso y descenso). & \cite{ac25_11b} \\
+        RF05 & Estimar la velocidad respecto al suelo a partir de datos GNSS. & Decisión de proyecto \\
+        RF06 & Medir la distancia al suelo mediante un sensor de proximidad principal, complementado con un segundo sensor de tecnología distinta con fines comparativos. & Decisión de proyecto \\
+        RF07 & Transmitir la telemetría de forma inalámbrica desde el nodo sensor hasta un receptor. & \cref{sec:ea_contribucion} \\
+        RF08 & Codificar la telemetría conforme al formato lógico del protocolo ARINC 429. & \cite{arinc429}, \cref{sec:ea_arinc} \\
+        RF09 & Visualizar los datos calculados en un PFD con disposición Basic-T. & \cite{ac25_11b} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+\section{Requisitos de rendimiento}
+\label{sec:req_rendimiento}
+
+Los requisitos de rendimiento cuantifican el comportamiento esperado del sistema.
+Los valores se derivan de los estándares de pantallas electrónicas de vuelo, complementados con valores obtenidos de plataformas AHRS con sensores MEMS de bajo coste.
+
+\begin{table}[H]
+    \centering
+    \caption{Requisitos de rendimiento del sistema}
+    \label{tab:req_rendimiento}
+    \begin{tabularx}{\linewidth}{l X l}
+        \toprule
+        \textbf{ID} & \textbf{Descripción} & \textbf{Fuente} \\
+        \midrule
+        RP01 & Latencia extremo a extremo (sensor a PFD) inferior a \SI{200}{\milli\second}. & \cite{sae_as8034c} \\
+        RP02 & Tasa de refresco del PFD igual o superior a \SI{30}{FPS}. & \cite{ac25_11b}, \cite{sae_as8034c} \\
+        RP03 & Tasa de actualización de la estimación de actitud igual o superior a \SI{20}{\hertz}. & \cite{ac25_11b} \\
+        RP04 & Precisión de la estimación de actitud (cabeceo y alabeo) dentro de $\pm 3^{\circ}$ en condiciones estáticas. & \cite{mahony2008}, \cite{cocoli2023} \\
+        RP05 & Precisión de posicionamiento GNSS igual o mejor que \SI{2.5}{\meter} CEP. & \cite{ds_neo6} \\
+        RP06 & Alcance del enlace de telemetría suficiente para uso en laboratorio, del orden de decenas de metros en interior. & Decisión de proyecto \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+\section{Restricciones del proyecto}
+\label{sec:req_restricciones}
+
+Las restricciones acotan el espacio de diseño y reflejan el contexto educativo y
+de bajo coste del proyecto.
+
+\begin{table}[H]
+    \centering
+    \caption{Restricciones del proyecto}
+    \label{tab:req_restricciones}
+    \begin{tabularx}{\linewidth}{l X l}
+        \toprule
+        \textbf{ID} & \textbf{Descripción} & \textbf{Fuente} \\
+        \midrule
+        RC01 & Coste total de materiales inferior a \SI{100}{\eur}. & Charter \\
+        RC02 & Todo el software empleado debe ser de código abierto. & Charter \\
+        RC03 & La plataforma debe ser compacta y transportable para uso en laboratorio. & Charter \\
+        RC04 & Alimentación mediante conector USB-C. & Charter \\
+        RC05 & La PCB debe ser fabricable mediante servicios estándar de prototipado. & Decisión de proyecto \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+\section{Requisitos normativos}
+\label{sec:req_normativos}
+
+Los requisitos normativos identifican las normas aeronáuticas que se siguen como
+referencia para el diseño. Como se ha indicado al inicio del capítulo, el
+sistema no aspira a certificación; las normas se aplican con carácter académico
+para que la plataforma sea representativa de un instrumento real.
+
+\begin{table}[H]
+    \centering
+    \caption{Requisitos normativos del sistema}
+    \label{tab:req_normativos}
+    \begin{tabularx}{\linewidth}{l X l}
+        \toprule
+        \textbf{ID} & \textbf{Descripción} & \textbf{Fuente} \\
+        \midrule
+        RN01 & Disposición de los instrumentos del PFD conforme al patrón Basic-T. & \cite{ac25_11b} \\
+        RN02 & Color y simbología del PFD conformes al estándar de displays electrónicos multipropósito. & \cite{sae_as8034c}, \cite{hfstd001b} \\
+        RN03 & Jerarquía de color para alertas conforme a la normativa FAA. & \cite{cfr25_1321}, \cite{cfr25_1322} \\
+        RN04 & Codificación lógica de la telemetría conforme al protocolo ARINC 429: formato de palabra, etiquetas, codificación BNR, paridad impar y SSM. & \cite{arinc429} \\
+        RN05 & El sistema no aspira a certificación aeronáutica ni a uso en vuelo real, por lo que no incorpora redundancia, protección ambiental ni sistemas de seguridad. & Decisión de proyecto, \cref{sec:exclusiones} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+

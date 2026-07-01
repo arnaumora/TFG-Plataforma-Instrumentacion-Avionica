@@ -1,0 +1,134 @@
+%!TEX root = ../main.tex
+
+\chapter{Introducción}
+\label{ch:introduccion}
+
+\section{Motivación}
+\label{sec:motivacion}
+
+En el ámbito de los vehículos aéreos no tripulados de relativo bajo coste, como
+drones de uso personal, los controladores como Betaflight o iNav ya han resuelto
+el problema de la fusión de sensores en hardware de bajo coste. En estos sistemas
+se usan sensores y microcontroladores muy populares y algoritmos relativamente
+fáciles de implementar en software. El hardware y software se encuentran en un
+estado muy maduro. El problema es que para uso educativo estos sistemas utilizan software con millones de líneas de código que no los hacen intuitivos para
+estudiantes. Además, el PFD en estos sistemas no sigue las regulaciones presentes
+en normativa aeronáutica, lo que tampoco los hace deseables para uso didáctico.
+
+Por otro lado, en las clases de ingeniería los estudiantes estudian
+la instrumentación de cabina de aeronaves (indicadores de actitud, altímetros,
+etc.) a nivel teórico o mediante simuladores. Estos simuladores permiten
+familiarizarse con la interfaz de un PFD, pero detrás no hay hardware real, lo
+que los hace menos intuitivos y más difícil de aprender de ellos.
+
+De estos dos factores nace la idea de este proyecto: una plataforma que conecte
+ambos mundos, usando el mismo tipo de hardware y algoritmos del ecosistema de
+drones para alimentar un PFD basado en las directrices de la regulación aeronáutica. De
+esta forma, el estudiante puede recorrer el sistema completo de la
+instrumentación aviónica, desde la lectura del sensor hasta la representación en
+pantalla, incluyendo el hardware físico y el software. Además, el sistema
+completo se puede replicar por menos de \SI{100}{\eur} en materiales, haciéndolo
+fácil de incorporar en laboratorios, y todo el software empleado es de código
+abierto, lo que permite que otros estudiantes o docentes puedan reproducirlo sin
+coste de licencias.
+
+
+\section{Objetivo}
+\label{sec:objetivo}
+
+El objetivo de este proyecto es el diseño e implementación de una plataforma
+experimental de bajo coste orientada a la emulación de instrumentación
+aviónica. El sistema se basa en un microcontrolador como núcleo y un
+conjunto de sensores que incluyen sensores inerciales, barómetro, GPS, radar y
+telemetría inalámbrica. A partir de la información proporcionada por los
+sensores se calcula la actitud, el rumbo, la altitud y la velocidad vertical de
+la plataforma en tiempo real. Sobre estos datos se desarrolla el software de
+visualización en una pantalla similar a la de un \textit{Primary Flight Display}
+(PFD).
+
+El resultado final es un sistema integrado por tres subsistemas principales:
+
+\begin{enumerate}
+    \item Una PCB que integra los componentes físicos del proyecto, como el
+    controlador y los sensores.
+    \item El firmware que recibe los datos de los sensores, los integra mediante
+    fusión sensorial y transmite los resultados al tercer subsistema.
+    \item Un PFD implementado en el lenguaje Processing que muestra los valores
+    calculados.
+\end{enumerate}
+
+
+\section{Alcance del proyecto}
+\label{sec:alcance}
+
+El alcance del proyecto se ha organizado en los siguientes paquetes de trabajo,
+que estructuran también el contenido de la memoria:
+
+\begin{enumerate}
+    \item \textbf{Estado del arte:} estudio del estado actual en
+    instrumentación aviónica, sistemas AHRS y visualización de vuelo, junto con
+    el análisis de las normativas aplicables.
+
+    \item \textbf{Definición de requisitos y arquitectura del sistema:} a partir
+    del estado del arte se establecen los requisitos funcionales, de rendimiento,
+    restricciones y normativos del sistema, y se define la arquitectura general en
+    bloques funcionales, que orientan el resto del diseño.
+
+    \item \textbf{Selección de componentes:} selección de los componentes del
+    sistema físico, principalmente el controlador y los sensores, basada en el
+    estudio del estado del arte.
+
+    \item \textbf{Diseño PCB:} diseño del esquema eléctrico y la placa de
+    circuito impreso que integra todos los módulos del sistema, microcontrolador
+    y sensores seleccionados.
+
+    \item \textbf{Firmware y calibración:} desarrollo de la arquitectura del
+    firmware en Arduino, implementación de la calibración de los sensores y
+    lectura de los datos.
+
+    \item \textbf{Filtro de fusión de sensores (AHRS):} selección del filtro más
+    adecuado en función de varios parámetros e implementación del mismo para
+    obtener los parámetros deseados a partir de los valores de los sensores.
+
+    \item \textbf{Sistema de telemetría:} desarrollo del sistema de transmisión
+    inalámbrica entre el transmisor (microcontrolador y sensores) y el receptor
+    (PC).
+
+    \item \textbf{Visualización PFD:} implementación del Primary Flight Display
+    completo con la disposición estándar Basic-T, marcada por la regulación
+    correspondiente, y desarrollada en el entorno Processing.
+
+    \item \textbf{Integración del sistema y pruebas de validación:} integración
+    de todos los subsistemas desarrollados (hardware, firmware, telemetría y
+    PFD) y documentación de los resultados obtenidos.
+\end{enumerate}
+
+
+\section{Actividades excluidas y limitaciones}
+\label{sec:exclusiones}
+
+Las siguientes actividades quedan fuera del alcance de este proyecto, aunque se
+pueden identificar como líneas de trabajo futuro:
+
+\begin{itemize}
+    \item \textbf{Integración en una plataforma de vuelo.} La plataforma está
+    diseñada para operar en tierra de forma experimental, no a bordo de un dron
+    o aeronave real.
+
+    \item \textbf{Representación del \textit{Flight Path Vector}.} Aunque sería una
+    adición interesante para el PFD, requeriría datos de viento y navegación
+    que están fuera del alcance del proyecto.
+
+    \item \textbf{Certificación aeronáutica.} Aunque se sigue una serie de regulaciones
+    para el desarrollo de algunos subsistemas, el resultado final está pensado
+    para uso educativo y no aspira a ningún tipo de certificación.
+
+    \item \textbf{Sistemas aviónicos adicionales.} No se contempla la incorporación
+    de sistemas como radar meteorológico, TCAS, ADS-B o FMS.
+\end{itemize}
+
+Como limitación principal, el sistema no está diseñado ni para certificación
+aeronáutica ni para el control real de un vehículo aéreo. Por este motivo no
+incorpora redundancia, protección ambiental ni los sistemas de seguridad que
+serían requeridos para un sistema real. Esto es coherente con su propósito: se
+trata de una plataforma de aprendizaje, no de un equipo de vuelo.

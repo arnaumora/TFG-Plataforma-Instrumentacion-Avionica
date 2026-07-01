@@ -1,0 +1,75 @@
+\chapter{ANEXO I. Código Arduino}
+
+% 1. Sketch principal (setup y loop)
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Sketch principal: setup y loop}, label={lst:flight_instruments}]{../../Software/Arduino/6-Final_code/FlightInstruments/FlightInstruments.ino}
+\end{mdframed}
+
+% 2. Constantes de hardware y parámetros de ajuste
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Constantes de hardware y parámetros de ajuste}, label={lst:config_h}]{../../Software/Arduino/6-Final_code/FlightInstruments/Config.h}
+\end{mdframed}
+
+% 3. Estructuras de datos compartidas
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Estructuras de datos compartidas}, label={lst:sensor_data_h}]{../../Software/Arduino/6-Final_code/FlightInstruments/SensorData.h}
+\end{mdframed}
+
+% 4. Calibración del bias del giroscopio
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Calibración del bias del giroscopio}, label={lst:calibration}]{../../Software/Arduino/6-Final_code/FlightInstruments/Calibration.ino}
+\end{mdframed}
+
+% 5. Driver del MPU-9250 y AK8963
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Driver del MPU-9250 y AK8963}, label={lst:imu}]{../../Software/Arduino/6-Final_code/FlightInstruments/IMU.ino}
+\end{mdframed}
+
+% 6. Driver del barómetro BMP280
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Driver del barómetro BMP280}, label={lst:barometer}]{../../Software/Arduino/6-Final_code/FlightInstruments/Barometer.ino}
+\end{mdframed}
+
+% 7. Driver del GPS NEO-6M
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Driver del GPS NEO-6M}, label={lst:gps}]{../../Software/Arduino/6-Final_code/FlightInstruments/GPS.ino}
+\end{mdframed}
+
+% 8. Driver del VL53L1X (Time-of-Flight)
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Driver del VL53L1X (Time-of-Flight)}, label={lst:tof}]{../../Software/Arduino/6-Final_code/FlightInstruments/ToF.ino}
+\end{mdframed}
+
+% 9. Driver del radar HLK-LD2410C
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Driver del radar HLK-LD2410C}, label={lst:radar}]{../../Software/Arduino/6-Final_code/FlightInstruments/Radar.ino}
+\end{mdframed}
+
+% 10. Filtro Mahony MARG de 9 ejes
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Filtro Mahony MARG de 9 ejes}, label={lst:sensor_fusion}]{../../Software/Arduino/6-Final_code/FlightInstruments/SensorFusion.ino}
+\end{mdframed}
+
+% 11. Transmisor NRF24L01 con payload ARINC 429
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Transmisor NRF24L01 con payload ARINC 429}, label={lst:telemetry}]{../../Software/Arduino/6-Final_code/FlightInstruments/Telemetry.ino}
+\end{mdframed}
+
+
+% 12. Biblioteca ARINC 429 (codigo propio): cabecera
+% NOTA: ajusta la ruta a la ubicacion real de la libreria ARINC429
+% (carpeta del sketch o, si esta instalada como libreria, .../libraries/ARINC429/)
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Biblioteca ARINC 429 (código propio): cabecera}, label={lst:arinc429_h}]{../../Software/Arduino/6-Final_code/ARINC429/src/ARINC429.h}
+\end{mdframed}
+
+% 13. Biblioteca ARINC 429 (codigo propio): implementacion
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Biblioteca ARINC 429 (código propio): implementación}, label={lst:arinc429_cpp}]{../../Software/Arduino/6-Final_code/ARINC429/src/ARINC429.cpp}
+\end{mdframed}
+
+
+% 14. Receptor NRF24L01 y puente WiFi UDP (ESP32-C3)
+\begin{mdframed}[style=CodeFrame]
+\lstinputlisting[style=Arduino, caption={Receptor NRF24L01 y puente WiFi UDP (ESP32-C3)}, label={lst:receiver}]{../../Software/Arduino/6-Final_code/FlightInstruments_Receiver/FlightInstruments_Receiver.ino}
+\end{mdframed}

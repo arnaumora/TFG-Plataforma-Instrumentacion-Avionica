@@ -1,0 +1,241 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2639
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 CourierNewPSMT;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;\red16\green60\blue192;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c100000;\cssrgb\c6667\c33333\c80000;}
+{\info
+{\author awoods}
+{\*\company NGDC}}\vieww35840\viewh22400\viewkind1\viewscale167
+\deftab720
+\pard\pardeftab720\ri0\partightenfactor0
+
+\f0\fs20 \cf0 I. OVERVIEW	\
+\pard\pardeftab720\li360\ri0\partightenfactor0
+\cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 This program computes the magnetic field elements of the World Magnetic Model High-Resolution 2025.  They are: total field strength, horizontal field strength, northerly component, easterly component, downward component, declination, and inclination.  Required inputs are: position including altitude, and date.  When the position is entered by UTM coordinates, the magnetic declination is referred to the UTM grid, as an auxiliary calculation.
+\fs24 \
+\
+\pard\pardeftab720\li360\ri0\partightenfactor0
+
+\fs20 \cf0 Go to \cf2 \expnd0\expndtw0\kerning0
+\ul \ulc2 \outl0\strokewidth0 \strokec2 https://www.ncei.noaa.gov/products/world-magnetic-model-high-resolution\cf0 \kerning1\expnd0\expndtw0 \ulnone \outl0\strokewidth0  for more information.
+\fs24 \
+
+\fs20 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 II. INPUT\
+\pard\pardeftab720\li360\ri0\partightenfactor0
+\cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 1. Enter the position in one of three systems:
+\fs24 \
+\
+\pard\pardeftab720\li720\ri0\partightenfactor0
+
+\fs20 \cf0 \ul \ulc0 Deg/Min/Sec\ulnone .  Enter the longitude as degrees, minutes, and seconds, (all positive) and choose East or West to indicate the direction from Greenwich.  Enter the latitude as degrees, minutes and seconds (all positive) and choose North or South to indicate above or below the Equator.
+\fs24 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Degrees\ulnone .  Enter the longitude and latitude in decimal degrees with a leading minus sign for western longitudes or southern latitudes.
+\fs24 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+\cf0 \ul \ulc0 UTM\ulnone .  The two UTM coordinates for a point of interest are called its "Easting" and "Northing", but first the UTM system must be selected.
+\fs24 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 Enter the zone (1-60) of the UTM system.  Overlapping zone calculations are allowed (within limits) but normally, UTM zone 1 is for points between longitudes 180W and 174W, UTM zone 2 is for points between longitudes 174W and 168W, and so forth at 6 degree intervals, reaching zone 60 which is for points between longitudes 174E and 180E.  Normal usage or not, the zone number dictates that any point at the mid-longitude of the 6 degree interval has 500000 meters as its Easting.
+\fs24 \
+\
+
+\fs20 Enter the choice North or South.  Overlapping calculations are allowed (within limits), but normally, the choice "North" is for points above the Equator, and the choice "South" is for points below the Equator.  Normal usage or not, the choice "North" dictates that the Equator is assigned 0 meters as its Northing, and the choice "South" dictates that the Equator is assigned 10000000 meters as its Northing.
+\fs24 \
+\
+
+\fs20 Once the UTM system is chosen, enter the Easting and Northing of the point of interest.  In this program, the allowed ranges are:
+\fs24 \
+\
+\pard\pardeftab720\li1440\ri0\partightenfactor0
+
+\fs20 \cf0 -500000 < Easting  <  1500000     and \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 -500000 < Northing < 10500000.
+\fs24 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 2. Altitude\
+\pard\pardeftab720\li720\ri0\partightenfactor0
+\cf0 \
+\pard\pardeftab720\fi360\ri0\partightenfactor0
+\cf0 Enter the altitude in meters or feet, and indicate which. Indicate whether the height is above mean sea level (MSL) or WGS84 ellipsoid. The default is mean MSL. In this case, a correction will be applied to the user-entered height to change it to the height above WGS84 ellipsoid. The height can also be entered as above the WGS84 ellipsoid. In this case, no correction is applied. \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs24 \cf0 	\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 3. Date\
+\pard\pardeftab720\li720\ri0\partightenfactor0
+\cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 Enter a date between November 13, 2024 and December 31, 2030 using one of the formats provided:
+\fs24 \
+  \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+
+\fs20 \cf0 \ul \ulc0 Traditional format\ulnone .  Enter day, month, and year or use the drop down calendar.
+\fs24 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Decimal\ulnone .  Enter the date as the year number with a decimal fraction.
+\fs24 \
+\pard\pardeftab720\li720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 III. CALCULATE\
+\pard\pardeftab720\li360\ri0\partightenfactor0
+\cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 Press the calculate button or hit the enter key.\
+\
+IV. GOOGLE MAP \
+Press the Google Map button to display the Google Map of the location using the default\
+\
+V. OUTPUT
+\fs24 \
+\
+
+\fs20 The results can be selected and copied to the clipboard, and then pasted into any program recognizing Rich Text Format.  The values copied are in a tab separated format with a new line between the values at epoch and their changes per year.  The unit of measure for magnetic quantities is the nano-Tesla (nT) or, for angles, degrees and minutes.  Brief definitions of the output quantities follow:\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs24 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \ul \ulc0 Total\ulnone . The intensity (or strength) of the entire magnetic field at a given location. Geometrically, it is the length of the magnetic field vector. 
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Horizontal\ulnone . The intensity of the component of the magnetic field that is tangent to the Earth\'92s surface at a given point.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 North\ulnone . The portion of the magnetic field that is directed horizontally northward. A southward-directed field would have a negative value for the North component.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 East\ulnone . The portion of the magnetic field that is directed horizontally eastward. A westward-directed magnetic field would have a negative value for the East component.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Vertical\ulnone . The portion of the magnetic field that is directed perpendicular to the Earth's surface at a given location. Positive values point into the earth.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Declination\ulnone . The angle of difference between true North and magnetic North.  The rotation is from true North to magnetic North with the clockwise sense reported positively.  For instance, if the declination at a certain point was -10\'b0, then the north-seeking needle of a compass at that location would actually align 10\'b0 West of true North (10\'b0 counterclockwise from true North).  True North would be 10\'b0 East of the same needle.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Inclination\ulnone .  The angle between the magnetic field vector and the horizontal plane at that point.  The inclination is positive when the magnetic field points downward into the earth and negative when it points upward.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Longitude\ulnone . The longitude corresponding to the entered UTM location.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Latitude\ulnone . The latitude corresponding to the entered UTM location.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 True-Magnetic\ulnone . Same as Declination.  Shown again for comparison purposes.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 True-Grid\ulnone . The angle, positive for clockwise, from true North to grid North.  Grid North is the direction of increasing Northings along a line of constant Eastings.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Grid-Magnetic\ulnone . The angle, positive for clockwise, from grid North to magnetic North.  The concept is similar to the declination but uses grid North rather than true North as the reference direction.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Grid-True\ulnone . The angle, positive for clockwise, from grid North to true North. It is the negative of the True-Grid angle.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+Errors. The WMMHR2025 software and online calculator include an error model providing uncertainty estimates for every geomagnetic element (X, Y, Z, H, F, I and D) and every location at the Earth\'92s surface. This model is built upon the results of the error analysis, while taking into account the geometrical relationships between the various components. It includes both the commission error (due to inaccuracies in model coefficients) and the omission error (due to missing contributions to the total geomagnetic field such as crustal and external fields). The error values (Table 1) may be interpreted as one standard deviation difference between a hypothetical measurement and the calculator result for a location.\
+\
+Visit {\field{\*\fldinst{HYPERLINK "https://www.ncei.noaa.gov/products/geomagnetism-frequently-asked-questions"}}{\fldrslt \cf3 \expnd0\expndtw0\kerning0
+\ul \ulc3 \outl0\strokewidth0 \strokec3 https://www.ncei.noaa.gov/products/geomagnetism-frequently-asked-questions}} for more information on the individual field components.\
+\pard\pardeftab720\li360\ri0\partightenfactor0
+\cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 VII. ERRORS and WARNINGS\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs24 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 There are three categories of error handling.\
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs24 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \ul \ulc0 Data entry\ulnone .  When values are entered, the text may turn red or orange. Red denotes an error while orange denotes a warning. Details on the error or warning can be obtained by hovering the mouse over the value in question. These errors or warnings are shown as the values are entered.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Calculate\ulnone .  When either the calculate button or the enter key is pressed, errors or warnings might appear to the right or the left of the calculate button. Errors will prevent the results from being calculated. More information on the errors can be obtained by hovering the mouse over any input text that is red.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+\pard\pardeftab720\ri0\partightenfactor0
+\cf0 \ul \ulc0 Startup\ulnone . When the program is first started, an error will occur if the file, "WMMHR2025.COF" is either not in the same folder as the executable or cannot be opened.
+\fs24 \
+\pard\pardeftab720\ri0\partightenfactor0
+
+\fs20 \cf0 \
+}

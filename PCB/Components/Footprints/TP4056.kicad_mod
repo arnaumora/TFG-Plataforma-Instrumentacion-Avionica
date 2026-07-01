@@ -1,0 +1,218 @@
+(footprint "TP4056"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "Charging Module")
+	(property "Reference" "CM"
+		(at 14.15 19.61 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "c75e0c71-3fe5-4ba8-a6e4-405f18176758")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "TP4056"
+		(at 14.15 21.11 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "61c3b161-c4f1-4c35-8160-e5383ca0fcb8")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0782a30e-ffe8-40be-be51-5475325b496d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "977dd696-0b37-4603-a9c9-88eaeba99217")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(fp_line
+		(start -0.5 -0.5)
+		(end 28.8 -0.5)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a3b286f5-2d0d-4439-a9fb-824887d27c14")
+	)
+	(fp_line
+		(start -0.5 17.9)
+		(end -0.5 -0.5)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "78ad2658-bbb8-46a2-a7a3-74d419137644")
+	)
+	(fp_line
+		(start 28.8 -0.5)
+		(end 28.8 17.9)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "aa88ec96-9989-4d18-b621-c52d21df030e")
+	)
+	(fp_line
+		(start 28.8 17.9)
+		(end -0.5 17.9)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "ba06ac81-d5b4-4246-ae24-37b39ffca5e7")
+	)
+	(fp_rect
+		(start -0.63 -0.62)
+		(end 28.93 18.01)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "9aaf070a-4c00-4ea8-8399-1f4a7829ee4d")
+	)
+	(fp_line
+		(start 0 0)
+		(end 0 17.4)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "f49eab33-486c-43af-bd4d-3ba7d1c9b88a")
+	)
+	(fp_line
+		(start 0 0)
+		(end 28.3 0)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "e820e486-cf2d-4434-b642-aa2e6917ab70")
+	)
+	(fp_line
+		(start 0 17.4)
+		(end 28.3 17.4)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(layer "F.Fab")
+		(uuid "86340f74-ac21-4290-a6af-af6e20377777")
+	)
+	(fp_line
+		(start 28.3 0)
+		(end 28.3 17.4)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "cc2d869d-ef6f-4370-bfda-9f825fc011cf")
+	)
+	(pad "1" thru_hole circle
+		(at 1.7 1.5)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "68607f9e-3e03-4aec-99e6-ea8c24d4036e")
+	)
+	(pad "2" thru_hole circle
+		(at 1.7 15.9)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "0482b569-76ed-4dbd-9894-6148e0f5b87b")
+	)
+	(pad "3" thru_hole circle
+		(at 24.8 1.5)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "c591ce36-6b50-4750-ad71-867cb2fa65e2")
+	)
+	(pad "4" thru_hole circle
+		(at 24.8 4.5)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "b9c3c1be-c09b-49ac-9723-3cc6cefe3314")
+	)
+	(pad "5" thru_hole circle
+		(at 24.8 12.9)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "5b79488f-6835-4122-8f4f-3d3add07c5d4")
+	)
+	(pad "6" thru_hole circle
+		(at 24.8 15.9)
+		(size 1.7 1.7)
+		(drill 1)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "3edd9c16-e3a9-4146-84c1-cbcca08de604")
+	)
+	(group ""
+		(uuid "d1028120-e291-4b6a-9107-449bfe9b2361")
+		(members "0482b569-76ed-4dbd-9894-6148e0f5b87b" "3edd9c16-e3a9-4146-84c1-cbcca08de604"
+			"5b79488f-6835-4122-8f4f-3d3add07c5d4" "68607f9e-3e03-4aec-99e6-ea8c24d4036e"
+			"86340f74-ac21-4290-a6af-af6e20377777" "b9c3c1be-c09b-49ac-9723-3cc6cefe3314"
+			"c591ce36-6b50-4750-ad71-867cb2fa65e2" "cc2d869d-ef6f-4370-bfda-9f825fc011cf"
+			"e820e486-cf2d-4434-b642-aa2e6917ab70" "f49eab33-486c-43af-bd4d-3ba7d1c9b88a"
+		)
+	)
+	(embedded_fonts no)
+	(model "C:/Users/Arnau/Desktop/TFG/PCB/Components/3D/TP4056.step"
+		(offset
+			(xyz 14.13 -8.65 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -0 -0 -180)
+		)
+	)
+)

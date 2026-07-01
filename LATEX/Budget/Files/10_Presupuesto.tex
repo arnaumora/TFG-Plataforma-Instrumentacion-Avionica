@@ -1,0 +1,160 @@
+%!TEX root = ../main.tex
+
+\chapter{Presupuesto}
+\label{ch:presupuesto}
+
+En este documento se detalla el presupuesto del proyecto, el desglose completo del coste
+de desarrollo de la plataforma experimental de instrumentación aviónica. El coste
+se desglosa en el coste de los materiales, la amortización de los equipos empleados, el coste de personal y el coste de software. Los costes de los componentes se detallan en la memoria, en el capítulo de diseño de hardware.
+
+Salvo que se indique lo contrario, los precios son orientativos y se basan en el
+coste de mercado de los componentes y en tarifas de referencia.
+
+\section{Coste de materiales}
+\label{sec:pres_materiales}
+
+El coste de los materiales corresponde a los componentes electrónicos del sistema,
+la placa de circuito impreso (PCB) y los componentes pasivos y conectores. El
+subtotal de módulos se toma del resumen de componentes de la memoria. La PCB se
+fabrica mediante el servicio JLCPCB, \footnote{Servicio de fabricación de PCB de bajo coste: \url{https://jlcpcb.com/}. El coste depende del número de unidades de la tirada y del envío.} en una única orden que integra tanto el nodo transmisor como el nodo receptor.
+
+En la \cref{tab:pres_materiales} se pueden ver los valores de todos los componentes.
+
+\begin{table}[H]
+    \centering
+    \caption{Coste de materiales}
+    \label{tab:pres_materiales}
+    \footnotesize
+    \begin{tabularx}{\linewidth}{X r}
+        \toprule
+        \textbf{Concepto} & \textbf{Coste} \\
+        \midrule
+        Microcontrolador TX (ESP32-S3 DevKit)        & \SI{7}{\eur}  \\
+        Microcontrolador RX (ESP32-C3 Super Mini)     & \SI{4}{\eur}  \\
+        IMU + magnetómetro (MPU-9250)                 & \SI{6}{\eur}  \\
+        Barómetro (BMP280)                            & \SI{3}{\eur}  \\
+        Receptor GNSS (NEO-6M)                        & \SI{10}{\eur} \\
+        Sensor ToF (VL53L1X)                          & \SI{8}{\eur}  \\
+        Sensor radar (HLK-LD2410C)                    & \SI{9}{\eur}  \\
+        Transceptor RF, 2 uds (nRF24L01+ PA/LNA)      & \SI{8}{\eur}  \\
+        \midrule
+        Subtotal módulos                              & \SI{55}{\eur} \\
+        PCB (2 capas, JLCPCB, incl. envío)            & \SI{25}{\eur} \\
+        Componentes pasivos y conectores              & \SI{12}{\eur} \\
+        \midrule
+        \textbf{Total materiales}                     & \textbf{\SI{92}{\eur}} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+El coste total de materiales se mantiene por debajo de los \SI{100}{\eur},
+cumpliendo la restricción de coste de materiales del proyecto (RC01).
+
+\section{Amortización de equipos}
+\label{sec:pres_equipos}
+
+Para el desarrollo se han empleado diversos equipos de laboratorio cuyo coste no se
+imputa de forma íntegra, sino mediante amortización lineal en proporción a las horas
+de uso sobre su vida útil. La amortización de cada equipo se calcula como:
+
+\begin{equation}
+    A = \frac{V}{T_{\text{vida}}} \cdot \frac{h_{\text{uso}}}{h_{\text{anual}}}
+    \label{eq:amortizacion}
+\end{equation}
+
+donde $V$ es el valor de adquisición, $T_{\text{vida}}$ la vida útil en años,
+$h_{\text{uso}}$ las horas de uso en el proyecto y $h_{\text{anual}}$ las horas
+anuales de trabajo, estimadas en \SI{1800}{\hour}. La \cref{tab:pres_equipos} recoge
+la estimación para cada equipo.
+
+\begin{table}[H]
+    \centering
+    \caption{Amortización de equipos}
+    \label{tab:pres_equipos}
+    \footnotesize
+    \begin{tabularx}{\linewidth}{X r r r r}
+        \toprule
+        \textbf{Equipo} & \textbf{Valor (\euro)} & \textbf{Vida útil (años)} & \textbf{Uso (h)} & \textbf{Amort. (\euro)} \\
+        \midrule
+        Osciloscopio            & \num{400}  & \num{10} & \num{20}  & \num{0.44}  \\
+        Multímetro              & \num{40}   & \num{10} & \num{30}  & \num{0.07}  \\
+        Estación de soldadura   & \num{80}   & \num{10} & \num{15}  & \num{0.07}  \\
+        Ordenador               & \num{1000} & \num{6}  & \num{400} & \num{37.04} \\
+        \midrule
+        \textbf{Total amortización} & & & & \textbf{\num{37.62}} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Coste de personal}
+\label{sec:pres_personal}
+
+El coste de personal corresponde a las horas de ingeniería dedicadas al diseño, el
+desarrollo, la validación y la redacción del trabajo. La dedicación se estima a
+partir de los créditos ECTS del TFG: la normativa de la UPC establece una carga de
+trabajo de \SI{25}{\hour} por crédito ECTS,\footnote{Normativa del Trabajo de Fin de Grado y de Máster de la UPC: la carga de trabajo equivalente es de 1 ECTS por 25 horas de trabajo del estudiantado.} lo que para un TFG de \num{24}~ECTS
+equivale a \SI{600}{\hour}. Se aplica una tarifa orientativa de
+\SI{18}{\eur\per\hour} correspondiente a un ingeniero junior.\footnote{Tarifa orientativa basada en salarios de referencia para ingenieros en España (p.\,ej. \url{https://es.talent.com/salary}).}
+
+La \cref{tab:pres_personal} recoge la estimación.
+
+\begin{table}[H]
+    \centering
+    \caption{Coste de personal}
+    \label{tab:pres_personal}
+    \footnotesize
+    \begin{tabularx}{\linewidth}{X r r r}
+        \toprule
+        \textbf{Concepto} & \textbf{Horas} & \textbf{Tarifa} & \textbf{Coste} \\
+        \midrule
+        Ingeniería (diseño, desarrollo, validación y redacción) & \num{600} & \SI{18}{\eur\per\hour} & \SI{10800}{\eur} \\
+        \midrule
+        \textbf{Total personal}                                 &           &                        & \textbf{\SI{10800}{\eur}} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Coste de software}
+\label{sec:pres_software}
+
+Todo el software utilizado en el proyecto es de código abierto o de uso gratuito, en
+cumplimiento de la restricción RC02. El firmware se desarrolla en el IDE de Arduino,
+el software de visualización en Processing, el diseño de la PCB en KiCad y la
+redacción de la documentación en LaTeX. Ninguna de estas herramientas conlleva
+coste de licencia, por lo que el coste de software es de \SI{0}{\eur}.
+
+El consumo eléctrico asociado al desarrollo es despreciable, aun asi se considera que queda recogido de forma indirecta en la amortización del ordenador, por lo que no se contabiliza de forma separada.
+
+\section{Resumen del presupuesto}
+\label{sec:pres_resumen}
+
+La \cref{tab:pres_total} agrupa todos los costes anteriores. Sobre la suma de las
+partidas se aplica un \SI{10}{\percent} correspondiente a costes indirectos y, finalmente, el
+impuesto sobre el valor añadido (IVA)  del \SI{21}{\percent}.
+
+\begin{table}[H]
+    \centering
+    \caption{Resumen del presupuesto}
+    \label{tab:pres_total}
+    \footnotesize
+    \begin{tabularx}{\linewidth}{X r}
+        \toprule
+        \textbf{Concepto} & \textbf{Coste} \\
+        \midrule
+        Materiales                            & \SI{92}{\eur}       \\
+        Amortización de equipos               & \SI{37.62}{\eur}    \\
+        Software                              & \SI{0}{\eur}        \\
+        Personal                              & \SI{10800}{\eur}    \\
+        \midrule
+        Subtotal                              & \SI{10929.62}{\eur} \\
+        Costes indirectos (\SI{10}{\percent}) & \SI{1092.96}{\eur}  \\
+        \midrule
+        Total (sin IVA)                       & \SI{12022.58}{\eur} \\
+        IVA (\SI{21}{\percent})               & \SI{2524.74}{\eur}  \\
+        \midrule
+        \textbf{Total (con IVA)}              & \textbf{\SI{14547.32}{\eur}} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+El coste total del proyecto asciende a \SI{14547.32}{\eur} (IVA incluido). Como es habitual en proyectos de esta naturaleza, el coste está dominado por el coste de personal, mientras que el coste de materiales resulta marginal, en parte gracias al uso de hardware de bajo coste y software de código abierto.

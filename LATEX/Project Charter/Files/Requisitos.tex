@@ -1,0 +1,50 @@
+\chapter{Requisitos}
+
+En la siguiente tabla se presentan los requisitos del proyecto. Los requisitos han sido organizados en función de si son requisitos funcionales (RF), de rendimiento (RP), restricciones (RC) y normativos (RN). Aclarar que al no ser aplicado en un sistema real, los requisitos de rendimiento son valores orientativos mas que restricciones que se deben cumplir al 100\%. 
+
+\begin{xltabular}{\textwidth}{l l X}
+\caption{Requisitos del proyecto} \label{tab:requisitos} \\
+\toprule
+\textbf{ID} & \textbf{Categoría} & \textbf{Descripción} \\
+\midrule
+\endfirsthead
+
+\multicolumn{3}{l}{\small\itshape Continuación de la Tabla~\ref{tab:requisitos}} \\
+\toprule
+\textbf{ID} & \textbf{Categoría} & \textbf{Descripción} \\
+\midrule
+\endhead
+
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+% --- Funcionales ---
+RF01 & Funcional & El sistema debe estimar la actitud (cabeceo y alabeo) y el rumbo de la plataforma en tiempo real. \\
+RF02 & Funcional & El sistema debe calcular la altitud respecto al nivel del mar a partir de la presión atmosférica. \\
+RF03 & Funcional & El sistema debe estimar la velocidad vertical (tasa de ascenso/descenso) en tiempo real. \\
+RF04 & Funcional & Los datos deben transmitirse de forma inalámbrica desde el nodo sensor hasta un receptor. \\
+RF05 & Funcional & El receptor debe visualizar los datos en un PFD con disposición Basic-T. \\
+\midrule
+
+\pagebreak
+
+% --- Rendimiento ---
+RP01 & Rendimiento & Latencia extremo a extremo (sensor $\rightarrow$ PFD) inferior a 200\,ms. \\
+RP02 & Rendimiento & Tasa de refresco del PFD $\geq$ 30\,FPS, para una representación fluida. \\
+\midrule
+
+% --- Restricciones ---
+RC01 & Restricción & Coste total de materiales inferior a 100\,€. \\
+RC02 & Restricción & Todo el software utilizado debe ser de código abierto. \\
+RC03 & Restricción & La plataforma debe ser compacta y transportable para uso en laboratorio. \\
+RC04 & Restricción & Alimentación por USB (laboratorio) o batería. \\
+\midrule
+
+% --- Normativos ---
+RN01 & Normativa & La disposición y los elementos del PFD deben seguir la normativa aeronáutica aplicable a pantallas electrónicas de vuelo. \\
+
+\end{xltabular}
+
+Los requisitos normativos merecen una aclaración: el sistema no aspira a certificación aeronáutica, pero sí toma las normativas como referencia para que el PFD sea representativo de los instrumentos reales y tenga validez como herramienta educativa.

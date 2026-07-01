@@ -1,0 +1,183 @@
+%!TEX root = ../main.tex
+
+\chapter{Diseño del software del PFD}
+\label{ch:software}
+
+El \cref{ch:firmware} ha descrito cómo el nodo receptor entrega al PC el estado
+de vuelo decodificado mediante la frase \texttt{\$TEL}. Este capítulo
+describe el software de la estación de tierra, una aplicación que recibe los datos y representa los parámetros en un PFD con disposición Basic-T (RF09, RN01). Se describen la disposición y simbología
+del PFD, la recepción y el suavizado de los datos, los instrumentos y, por
+último, la vista de mapa de navegación.
+
+
+\section{Entorno y organización}
+\label{sec:sw_entorno}
+
+El PFD se implementa en Processing,\footnote{Processing, entorno de
+\textit{software} libre para programación gráfica: \texttt{processing.org}.} un
+entorno de programación gráfico de código abierto basado en Java. Se elige por su gestión directa del dibujo en dos dimensiones,
+su portabilidad y su baja barrera de entrada, adecuada para una herramienta
+docente. El render utiliza el motor P2D a \SI{60}{FPS}. Se escoge este motor, ya que se observan menos defectos en pantalla comparado con el motor por defecto.
+
+El código se organiza en un sketch principal (\texttt{FlightDisplay.pde}), que
+gestiona la recepción por puerto serie, el bucle de dibujo y el escalado de la
+ventana, y un archivo por cada instrumento: actitud, altímetro, VSI, velocidad
+respecto al suelo, rumbo y proximidad. Un archivo adicional
+(\texttt{GPSMap.pde}) añade la vista de mapa.
+
+
+\section{Disposición y simbología del PFD}
+\label{sec:sw_basict}
+
+La disposición sigue el patrón Basic-T de los displays electrónicos de vuelo
+\cite{ac25_11b}, equivalente al del \textit{glass cockpit} de aviación general.
+El indicador de actitud ocupa la posición central y de mayor tamaño, a la
+izquierda se sitúa la velocidad respecto al suelo y a la derecha el altímetro y
+el VSI. En la parte inferior del conjunto, el indicador de rumbo y en la esquina inferior, el indicador
+de proximidad. En la \cref{fig:basict_layout} se representa de forma general cómo se organizan los indicadores.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[font=\footnotesize,
+        inst/.style={draw, rounded corners=2pt, align=center, fill=black!5}]
+        \node[inst, minimum width=34mm, minimum height=34mm] (ai) at (0,0)
+            {Indicador\\de actitud\\(horizonte\\artificial)};
+        \node[inst, minimum width=12mm, minimum height=34mm, left=6mm of ai] (gs)
+            {GS\\(vel.\\suelo)};
+        \node[inst, minimum width=12mm, minimum height=34mm, right=6mm of ai] (alt)
+            {Altímetro};
+        \node[inst, minimum width=8mm,  minimum height=34mm, right=2mm of alt] (vsi)
+            {VSI};
+        \node[inst, minimum width=52mm, minimum height=11mm, below=7mm of ai] (hdg)
+            {Indicador de rumbo};
+        \node[inst, minimum width=22mm, minimum height=11mm, right=6mm of hdg] (prox)
+            {Proximidad};
+    \end{tikzpicture}
+    \caption{Disposición Basic-T de los instrumentos del PFD (RN01): actitud
+             central, velocidad de tierra a la izquierda, altímetro y VSI a la
+             derecha, rumbo debajo y proximidad en la esquina.}
+    \label{fig:basict_layout}
+\end{figure}
+
+La simbología y el código de color implementados siguen las guías de displays electrónicos y
+de factores humanos \cite{sae_as8034c, hfstd001b} y la jerarquía de color para
+alertas de la normativa \cite{cfr25_1321, cfr25_1322} (RN02, RN03). Estos colores están resumidos en
+la \cref{tab:sw_colores}.
+
+\begin{table}[H]
+    \centering
+    \caption{Código de color de la simbología del PFD}
+    \label{tab:sw_colores}
+    \begin{tabularx}{\linewidth}{l l X}
+        \toprule
+        \textbf{Elemento} & \textbf{Color} & \textbf{Uso} \\
+        \midrule
+        Cielo / tierra          & Azul / marrón & Horizonte artificial. \\
+        Simbología fija         & Blanco        & Escalas, marcas y símbolo del avión. \\
+        Lecturas numéricas      & Verde         & Valores actuales. \\
+        Referencias ajustables  & Cian          & \textit{Bug} de rumbo y ajuste Kollsman. \\
+        Precaución              & Ámbar         & Zona intermedia (proximidad, VSI). \\
+        Peligro                 & Rojo          & Enlace perdido y proximidad crítica. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+\section{Recepción y flujo de datos}
+\label{sec:sw_recepcion}
+
+La frase \texttt{\$TEL} se recibe por el puerto serie y se procesa línea a
+línea. Cada campo actualiza un \emph{valor objetivo}, no el valor mostrado:
+cabeceo, alabeo, rumbo, altitud, velocidad vertical, posición, satélites,
+indicadores de estado y la distancia de proximidad. El bucle de dibujo, a
+\SI{60}{FPS}, interpola el valor mostrado hacia el objetivo
+(\cref{sec:sw_suavizado}). Si transcurren más de \SI{2}{\second} sin recibir
+paquetes, el enlace se marca como perdido y el PFD lo señala. Las tramas
+corruptas (por interferencias o bytes perdidos) se descartan sin interrumpir la
+representación.
+
+
+\section{Suavizado de la representación}
+\label{sec:sw_suavizado}
+
+El paquete llega cada \SI{20}{\hertz}, pero el PFD se redibuja a \SI{60}{FPS}. Para
+que el movimiento sea continuo, cada parámetro se interpola linealmente hacia su
+objetivo en cada fotograma (filtro EMA):
+\begin{equation}
+    x[k] = x[k-1] + \alpha\,(x_{\text{obj}} - x[k-1]), \qquad \alpha = 0{,}4
+\end{equation}
+ Para algunos parametros también se implementa un valor mínimo antes de mostrar cambios, para evitar ver \textit{jitter} en pantalla. Este suavizado enmascara la cadencia del enlace sin añadir un retardo perceptible.
+
+
+\section{Instrumentos}
+\label{sec:sw_instrumentos}
+
+\paragraph{Indicador de actitud.}
+El horizonte artificial se dibuja como dos rectángulos (cielo y tierra, con
+gradiente) rotados según el alabeo y desplazados según el cabeceo, sobre los que
+se superponen la escala de cabeceo y el arco de alabeo. Una máscara circular (un
+rectángulo con un agujero circular recortado) deja visible solo el interior del
+instrumento. La referencia de alabeo es fija al instrumento (estilo
+\textit{sky pointer}).
+
+\paragraph{Altímetro.}
+Cinta vertical de altitud MSL con una ventana de Kollsman que muestra el ajuste
+barométrico, modificable por teclado. Este instrumento se modifica respecto al estándar, ya que en este caso el desplazamiento vertical es muy inferior a lo normal. Se hace el rango visible inferior para que el movimiento sea apreciable.
+
+\paragraph{Velocidad vertical (VSI).}
+Cinta con una barra de tendencia cuyo color varía con la magnitud (verde, ámbar,
+naranja). Igual que en el altímetro, la escala también se reduce para uso en banco.
+
+\paragraph{Velocidad respecto al suelo.}
+Cinta vertical alimentada por la velocidad derivada del GPS, convertida a nudos. Este instrumento casi no tiene utilidad en esta aplicación, pero se implementa para cumplir con el estándar de PFD.
+
+\paragraph{Indicador de rumbo.}
+Cinta horizontal con marcas cardinales y un \textit{bug} de rumbo cian ajustable
+con las flechas del teclado. Las marcas mayores se etiquetan según la convención
+aeronáutica (090$^{\circ}$ se muestra como ``9'').
+
+\paragraph{Indicador de proximidad.}
+Muestra la distancia al suelo con un código de color por umbrales (rojo, ámbar y
+verde, además de los estados de seguridad y de ausencia de datos). De forma
+coherente con la jerarquía de la \cref{sec:fw_proximidad} (RF06), la fuente
+activa es el ToF. El código que pertenece al radar también existe, pero se descarta el uso de sus datos debido a la poca fiabilidad que ofrece. El conjunto final se muestra en la
+\cref{fig:pfd_screenshot}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Figures/pfd.png}
+    \caption{PFD en disposición Basic-T con telemetría en vivo.}
+    \label{fig:pfd_screenshot}
+\end{figure}
+
+
+\section{Vista de mapa de navegación}
+\label{sec:sw_mapa}
+
+Como funcionalidad adicional al Basic-T, el PFD incorpora una vista de mapa de
+navegación, conmutable por teclado, que aprovecha la posición GPS (RF05). El
+mapa proyecta la posición en Web Mercator y emplea el esquema de teselas de OpenStreetMap.\footnote{Convención de teselas
+\textit{slippy map} de OpenStreetMap} Cada
+tesela se identifica por su nivel de zoom y sus índices, y se sitúa en pantalla
+mediante la lógica siguiente:
+\begin{equation}
+    x = \frac{\lambda+180}{360}\,256\cdot 2^{z}, \qquad
+    y = \frac{1}{2}\left[1 - \frac{\ln\!\left(\tan\varphi + \sec\varphi\right)}{\pi}\right]256\cdot 2^{z}
+\end{equation}
+con $\lambda$ la longitud, $\varphi$ la latitud y $z$ el nivel de zoom.
+
+Las teselas son topográficas del ICGC,\footnote{Servei de Mapes Base de l'ICGC,
+capa topográfica; licencia CC-BY (Cataluña) / ODbL (resto del mundo):
+\texttt{icgc.cat}.} descargadas previamente a disco con un script en Python para que el mapa funcione sin
+conexión. Las teselas ausentes, no descargadas, se dibujan como celdas grises. Sobre el mapa se trazan la traza GPS (normalmente no es visible, ya que no hay desplazamiento suficiente de la placa), el símbolo del avión orientado al rumbo actual, una
+rosa de los vientos, una barra de escala calculada según la resolución real en
+metros por píxel de Web Mercator, y por último una barra con información general de los datos del GNSS. La disposición de esta vista sigue las recomendaciones de \cite{hfstd001b} para
+displays de mapa. El resultado se muestra en la \cref{fig:gps_map}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{Figures/map.png}
+    \caption{Vista de mapa de navegación con teselas topográficas del ICGC, traza
+             GPS y símbolo del avión orientado al rumbo.}
+    \label{fig:gps_map}
+\end{figure}

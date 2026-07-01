@@ -1,0 +1,327 @@
+%\usepackage[utf8]{inputenc}
+%\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla,es-noshorthands]{babel}
+\usepackage{csquotes}                 
+
+
+% GEOMETRÍA Y FORMATO
+\usepackage[
+    a4paper,
+    left=2.5cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=3cm
+]{geometry}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5\baselineskip plus 2pt minus 1pt}     
+\usepackage{setspace}
+\setstretch{1.25}                     
+
+\renewcommand{\thefootnote}{\roman{footnote}}  
+
+% COLORES
+\usepackage[dvipsnames,table,xcdraw]{xcolor}
+
+% GRÁFICOS Y TABLAS
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}                 
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{xltabular}
+\usepackage{makecell}
+\usepackage{wrapfig} 
+\usepackage{verbatim} 
+\usepackage{comment}    
+\usepackage{pgfgantt}    
+
+\usepackage{array}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+% TIKZ Y DIAGRAMAS
+\usepackage{tikz}                     % declaracion explicita (best practice)
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{
+    positioning,                      % right=of, below=of, etc.
+    arrows.meta,                      % puntas modernas (Stealth, Latex, etc.)
+    shapes.geometric,                 % diamond, ellipse, trapezoid
+    shapes.misc,                      % chamfered rectangle, etc.
+    calc,                             % aritmetica de coordenadas ($(a)+(1,0)$)
+    fit,                              % agrupar nodos en una caja
+    backgrounds,                      % capas de fondo (\begin{scope}[on background layer])
+    decorations.pathreplacing         % llaves y anotaciones sobre flechas
+}
+
+
+% Estilos comunes para diagramas (definidos UNA vez aqui, usados en todas las figuras)
+\tikzset{
+    block/.style={
+        rectangle, draw, rounded corners=2pt,
+        minimum height=9mm, minimum width=24mm,
+        align=center, font=\small,
+        inner sep=4pt
+    },
+    sensor/.style={
+        block, fill=background_light
+    },
+    decision/.style={
+        diamond, draw, aspect=2,
+        align=center, font=\small,
+        inner sep=1pt
+    },
+    terminal/.style={
+        ellipse, draw, minimum width=20mm, minimum height=8mm,
+        align=center, font=\small
+    },
+    arrow/.style={
+        -Stealth, thick
+    },
+    bus/.style={
+        -Stealth, very thick, double
+    },
+    label/.style={
+        font=\scriptsize, midway, fill=white, inner sep=1pt
+    }
+}
+
+% Colores personalizados
+\definecolor{background_light}{RGB}{245,245,245}
+\definecolor{border_color}{RGB}{120,120,120}
+\definecolor{keyword_blue}{RGB}{0,0,180}
+\definecolor{comment_green}{RGB}{34,139,34}
+\definecolor{string_red}{RGB}{163,21,21}
+\definecolor{number_gray}{RGB}{128,128,128}
+
+
+% MATEMÁTICAS Y UNIDADES
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
+\usepackage{textcomp}
+\usepackage{gensymb}                 
+\usepackage{siunitx}                  
+\sisetup{
+    output-decimal-marker={,},        
+    per-mode=symbol,
+    range-phrase={\,--\,},
+    range-units=single,
+    detect-all
+}
+% Definir unidades adicionales
+\DeclareSIUnit\baud{Bd}
+\DeclareSIUnit\sample{S}
+\DeclareSIUnit{\eur}{\text{\euro}}
+
+% LISTADOS DE CÓDIGO
+\usepackage{listings}
+\usepackage[framemethod=tikz]{mdframed}
+
+% Marco para bloques de código
+\mdfdefinestyle{CodeFrame}{
+    roundcorner=5pt,
+    backgroundcolor=background_light,
+    linecolor=border_color,
+    linewidth=0.5pt,
+    innertopmargin=10pt,
+    innerbottommargin=10pt,
+    innerleftmargin=10pt,
+    innerrightmargin=10pt,
+    skipabove=10pt,
+    skipbelow=10pt,
+}
+
+% Configuración base para código
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    breakatwhitespace=false,
+    columns=flexible,
+    keepspaces=true,
+    showstringspaces=false,
+    showspaces=false,
+    tabsize=4,
+    frame=none,
+    numbers=left,
+    numberstyle=\tiny\color{number_gray},
+    numbersep=8pt,
+    xleftmargin=15pt,
+    captionpos=b,
+    extendedchars=true,
+    inputencoding=utf8,
+    literate=
+        {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+        {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+        {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {Ü}{{\"U}}1,
+}
+
+% Estilo Arduino/C++ (para firmware ESP32)
+\lstdefinestyle{Arduino}{
+    language=C++,
+    keywordstyle=\color{keyword_blue}\bfseries,
+    commentstyle=\color{comment_green}\itshape,
+    stringstyle=\color{string_red},
+    morekeywords={
+        HIGH,LOW,INPUT,OUTPUT,INPUT_PULLUP,LED_BUILTIN,
+        Serial,Wire,String,boolean,byte,word,
+        pinMode,digitalWrite,digitalRead,analogRead,analogWrite,
+        delay,millis,micros,setup,loop,
+        Serial1,Serial2,HardwareSerial,BluetoothSerial,
+        begin,print,println,available,read,write,flush,
+        uint8_t,uint16_t,uint32_t,int8_t,int16_t,int32_t,
+        float,double,void,bool,true,false,NULL,
+        PROGMEM,F,sizeof,static_cast
+    },
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+    morestring=[b]",
+    morestring=[b]',
+}
+
+% Estilo Processing/Java (para software PFD)
+\lstdefinestyle{Processing}{
+    language=Java,
+    keywordstyle=\color{keyword_blue}\bfseries,
+    commentstyle=\color{comment_green}\itshape,
+    stringstyle=\color{string_red},
+    morekeywords={
+        void,setup,draw,settings,size,fullScreen,
+        background,fill,stroke,noFill,noStroke,strokeWeight,
+        ellipse,rect,line,arc,triangle,quad,point,vertex,
+        beginShape,endShape,curveVertex,bezierVertex,
+        translate,rotate,scale,pushMatrix,popMatrix,resetMatrix,
+        color,loadImage,image,PImage,PFont,textFont,createFont,
+        text,textSize,textAlign,textWidth,
+        mouseX,mouseY,mousePressed,keyPressed,key,keyCode,
+        width,height,frameRate,frameCount,displayWidth,displayHeight,
+        Serial,printArray,println,print,nf,nfc,nfp,nfs,
+        map,constrain,lerp,norm,dist,mag,
+        radians,degrees,sin,cos,tan,atan2,asin,acos,
+        sqrt,pow,abs,min,max,floor,ceil,round,
+        random,noise,randomSeed,noiseSeed,
+        CENTER,LEFT,RIGHT,TOP,BOTTOM,CORNER,CORNERS,BASELINE,
+        PI,TWO_PI,HALF_PI,QUARTER_PI,TAU,
+        RGB,HSB,ARGB,ALPHA,
+        CLOSE,OPEN,CHORD,PIE
+    },
+    morecomment=[l]{//},
+    morecomment=[s]{/*}{*/},
+}
+
+% Estilo Python
+\lstdefinestyle{Python}{
+    language=Python,
+    keywordstyle=\color{keyword_blue}\bfseries,
+    commentstyle=\color{comment_green}\itshape,
+    stringstyle=\color{string_red},
+    morekeywords={self,True,False,None,as,with,lambda,yield,async,await},
+}
+
+% Nombre de los listados en español
+\renewcommand{\lstlistingname}{Código}
+\renewcommand{\lstlistlistingname}{Índice de Códigos}
+
+
+% LISTAS Y ENUMERACIÓN
+\usepackage{enumitem}
+
+
+% ENCABEZADOS Y PIES DE PÁGINA
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\setlength{\headsep}{0.5cm}
+
+\pagestyle{fancy}
+\fancyhf{} 
+
+% Estilo para páginas normales
+\fancyhead[L]{\small\leftmark}                    
+\fancyhead[R]{\thepage} 
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Estilo para páginas de inicio de capítulo
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyfoot[C]{\thepage}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+
+% BIBLIOGRAFÍA
+% BIBLIOGRAFIA (UNE-ISO 690, sistema numerico)
+\usepackage[
+    backend=biber,
+    style=iso-numeric,      % <-- biblatex-iso690: implementa UNE-ISO 690
+    sorting=none,           % orden de aparicion en el texto
+    maxnames=3,
+    minnames=1,
+    shortnumeration=true,   % edicion abreviada: "3.a ed." en vez de "tercera edicion"
+    pagetotal=false,        % no mostrar total de paginas
+]{biblatex}
+
+\addbibresource{../Common/references.bib}
+
+
+% HIPERVÍNCULOS 
+\usepackage{xurl}                     
+\usepackage[
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=blue,
+    breaklinks=true,
+    pdfauthor={Arnau},
+    pdftitle={Flight Instruments Emulation Platform},
+    pdfsubject={TFG - Trabajo de Fin de Grado},
+    pdfkeywords={ESP32, IMU, GPS, PFD, instrumentación aérea},
+    bookmarks=true,
+    bookmarksnumbered=true
+]{hyperref}
+
+
+% REFERENCIAS CRUZADAS
+\usepackage[spanish,capitalise]{cleveref}
+
+% Personalizar nombres
+\crefname{figure}{Figura}{Figuras}
+\crefname{table}{Tabla}{Tablas}
+\crefname{equation}{Ecuación}{Ecuaciones}
+\crefname{chapter}{Capítulo}{Capítulos}
+\crefname{section}{Sección}{Secciones}
+\crefname{appendix}{Apéndice}{Apéndices}
+\crefname{listing}{Código}{Códigos}
+
+
+% SÍMBOLOS Y OTROS
+\usepackage{eurosym}
+\usepackage{pdfpages}                 
+
+
+% COMANDOS PERSONALIZADOS
+
+% Código inline: \code{setup()}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% Nombres de archivo: \file{main.ino}
+\newcommand{\file}[1]{\texttt{#1}}
+
+% Componentes: \component{ESP32}
+\newcommand{\component}[1]{\textsc{#1}}
+
+% Registros: \register{PWR\_MGMT\_1}
+\newcommand{\register}[1]{\texttt{#1}}
+
+% Dirección I2C: \iicaddr{0x68}
+\newcommand{\iicaddr}[1]{\texttt{#1}}
+
+% Pin: \pin{GPIO21}
+\newcommand{\pin}[1]{\texttt{#1}}
+
+% Abreviatura de pendiente
+\newcommand{\pte}{pte.}

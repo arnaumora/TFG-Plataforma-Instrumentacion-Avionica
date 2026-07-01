@@ -1,0 +1,141 @@
+%!TEX root = ../main.tex
+
+\chapter{Arquitectura del sistema}
+\label{ch:arquitectura}
+
+Una vez definidos los requisitos en el \cref{ch:requisitos}, este capítulo
+presenta la arquitectura general del sistema y justifica las decisiones de
+diseño a alto nivel. El objetivo es ofrecer una visión global antes de entrar
+en el detalle de cada subsistema en los capítulos posteriores: diseño de
+hardware en el \cref{ch:hardware}, diseño del firmware en el
+\cref{ch:firmware} y diseño del software del PFD en el \cref{ch:software}.
+La elección concreta de cada componente (microcontroladores, sensores,
+transceptor de radiofrecuencia, etc.) se justifica en la
+\cref{sec:seleccion_componentes} del \cref{ch:hardware}, en este capítulo se
+trabaja al nivel de bloque funcional.
+
+\section{Visión general del sistema}
+\label{sec:vision_general}
+
+El sistema se compone de cuatro elementos principales, dispuestos
+en una arquitectura transmisor-receptor con enlace inalámbrico, según se muestra
+en la \cref{fig:arquitectura_top}.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=3mm and 7.5mm,
+        every node/.style={font=\small}
+    ]
+
+        % --- Sensores apilados ---
+        \node[sensor, minimum width=30mm] (imu)   {\textbf{IMU}\\\footnotesize Acel + Giro + Mag};
+        \node[sensor, minimum width=30mm, below=of imu]   (baro)  {\textbf{Barometro}};
+        \node[sensor, minimum width=30mm, below=of baro]  (gps)   {\textbf{Receptor GNSS}};
+        \node[sensor, minimum width=30mm, below=of gps]   (tof)   {\textbf{ToF}\\\footnotesize Telemetro laser};
+        \node[sensor, minimum width=30mm, below=of tof]   (radar) {\textbf{Radar FMCW}};
+
+        % --- Transmisor ---
+        \coordinate (mid_east) at ($(imu.east)!0.5!(radar.east)$);
+        \node[block, fill=background_light, minimum height=24mm, minimum width=24mm,
+              right=18mm of mid_east] (tx) {\textbf{Microcontrolador}\\\footnotesize Transmisor};
+
+        % --- RF, RX, PC en linea ---
+        \node[block, fill=background_light, minimum height=24mm, minimum width=18mm,
+              right=of tx] (rf) {\textbf{Transceptor}\\\footnotesize RF};
+        \node[block, fill=background_light, minimum height=24mm, minimum width=24mm,
+              right=of rf] (rx) {\textbf{Microcontrolador}\\\footnotesize Receptor};
+        \node[block, fill=background_light, minimum height=24mm, minimum width=16mm,
+              right=of rx] (pc) {\textbf{PC}\\\footnotesize PFD};
+
+        % --- Flechas desde sensores hacia TX ---
+        \coordinate (bus_x) at ($(tx.west)+(-6mm,0)$);
+
+        \foreach \src/\proto in {imu/I2C, baro/I2C, gps/UART, tof/I2C, radar/UART} {
+            \draw[arrow] (\src.east) -- node[above, font=\scriptsize, inner sep=1pt, pos=0.5] {\proto}
+                (\src.east -| bus_x) |- (tx.west);
+        }
+
+        % --- Cadena horizontal ---
+        \draw[bus] (tx.east) -- (rf.west)
+            node[midway, above, font=\scriptsize] {SPI};
+        \draw[bus] (rf.east) -- (rx.west)
+            node[midway, above, font=\scriptsize] {RF};
+        \draw[bus] (rx.east) -- (pc.west)
+            node[midway, above, font=\scriptsize] {USB};
+
+    \end{tikzpicture}%
+    }
+    \caption{Diagrama de bloques de alto nivel del sistema.}
+    \label{fig:arquitectura_top}
+\end{figure}
+
+El nodo transmisor agrupa todos los sensores y ejecuta el firmware de Arduino, encargado de adquirir las medidas en bruto de los sensores, y procesarlas con la fusión o filtros para obtener las magnitudes de vuelo. El enlace de radiofrecuencia utiliza un transceptor de radiofrecuencia de corto alcance operando en la banda de \SI{2.4}{\giga\hertz}, este envía los paquetes codificados en formato ARINC 429 hacia el nodo receptor. El nodo receptor decodifica estos paquetes y los envía hacia al PC por puerto serie para ser visualizados. En el PC se ejecuta el software de Processing para visualizar el PFD con los datos recibidos. 
+
+Los componentes específicos como el microcontrolador del transmisor y del receptor, los sensores y
+el transceptor RF se eligen siguiendo los criterios y las comparativas
+detalladas en la \cref{sec:seleccion_componentes}.
+
+
+
+\section{Partición transmisor-receptor}
+\label{sec:particion}
+
+La primera decisión arquitectónica tomada es la partición del sistema en dos nodos, transmisor receptor. Una alternativa clara y más sencilla a esta consiste en concentrar los sensores en un único microcontrolador conectado al PC directamente por puerto serie. A pesar de tener algunos beneficios, esta opción se ha descartado por tres motivos principales.
+
+En primer lugar, la separación física de la unidad de sensores y la unidad de visualización refleja la arquitectura real de una aeronave, donde los sensores se distribuyen por la aeronave, mientras que la visualización se encuentra en cabina. Mantener esta separación ayuda a la comprensión de los sistemas reales.
+
+En segundo lugar, el cable directo al PC limita la movilidad del nodo sensor. La plataforma está diseñada para poder situarse en una mesa de ensayo o un soporte móvil mientras que la visualización se mantiene en una posición fija junto al PC. El desacoplo aporta una separación física sin sacrificar demasiado en prestaciones, cumpliendo con los requisitos de latencia (RP01) y alcance (RP06). 
+
+Por último, la introducción del enlace inalámbrico añade un componente docente adicional. El alumno puede estudiar el efecto del medio físico en las conexiones inalámbricas y estudiar la codificación para transmitir la información estructurada siguiendo la normativa aeronáutica.
+
+
+Aparte de la radiofrecuencia se han considerado otras opciones para implementar el enlace de telemetría, resumidas en la \cref{tab:alternativas_enlace}.
+
+\vspace{1em}
+
+\begin{table}[H]
+    \centering
+    \caption{Alternativas consideradas para el enlace de telemetría}
+    \label{tab:alternativas_enlace}
+    \begin{tabularx}{\linewidth}{p{4cm} X l}
+        \toprule
+        \textbf{Alternativa} & \textbf{Motivo de descarte} & \textbf{Req.\ asociado} \\
+        \midrule
+        Cable serie directo (USB / UART) & Limita la movilidad del nodo sensor y elimina el componente docente del enlace inalámbrico. & RF07 \\
+        WiFi UDP & Mayor consumo, espectro habitualmente saturado en entornos académicos. & RP01, RC03 \\
+        Bluetooth Classic & Latencia típica superior a la requerida, payload útil reducido y emparejamiento más complejo. & RP01 \\
+        Bluetooth Low Energy (BLE) & Optimizado para baja tasa de envío, no para flujo continuo de telemetría estructurada. & RP03, RP06 \\
+        Transceptor RF en banda ISM \SI{2.4}{\giga\hertz} & Seleccionado. & RF07, RP06 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+La categoría seleccionada (transceptor RF de corto alcance en banda ISM)
+se elige por su latencia característica (la transmisión de un paquete por el
+enlace es inferior a \SI{10}{\milli\second} en el escenario de uso), su alcance suficiente para entornos
+de laboratorio (RP06) y la disponibilidad de módulos comerciales de bajo coste
+compatibles con el resto del sistema (RC01). El modelo concreto del módulo, su
+configuración y los parámetros de transmisión se justifican en la \cref{sec:seleccion_componentes}.
+
+
+\section{Enlace de telemetría}
+\label{sec:enlace}
+
+Por el enlace transceptor-receptor viaja la telemetría, en flujo unidireccional de paquetes de tamaño fijo. Estos paquetes vienen definidos por el tamaño máximo del payload del transceptor, 32 bytes. En esa cifra caben exactamente 8 palabras ARINC 429 de 32 bits, 4 bytes cada una, que ocupan los 32 bytes del payload de la radio. Al coincidir el tamaño del paquete físico y del paquete lógico, no es necesario implementar fragmentación de los paquetes, lo que simplifica el enlace.
+
+El enlace opera a \SI{20}{\hertz}, un paquete cada \SI{50}{\milli\second}, lo cual cumple con el requisito de performance RP03 (actitud a \SI{20}{\hertz} o superior) y deja margen suficiente para el RP01 (latencia extremo a extremo por debajo de \SI{200}{\milli\second}). La configuración concreta del transceptor (canal, potencia de salida, etc.) se explica con más detalle en \cref{sec:seleccion_componentes}.
+
+
+\section{Capa lógica de telemetría: ARINC 429}
+\label{sec:arinc_arq}
+
+A través de la capa física del transceptor la telemetría se codifica utilizando el formato lógico definido por el estándar ARINC 429 \cite{arinc429}. Esta elección se justifica con 3 criterios principales: la trazabilidad de la norma aeronáutica, el valor docente que aporta a los estudiantes y el hecho de que utilizando esta norma ya se dispone de un formato de palabra estructurado que incluye los campos necesarios para la transmisión, sin tener que desarrollar un sistema desde cero.
+
+
+Es importante reiterar la distinción entre las dos capas de esta especificación. La capa física del ARINC 429 define la señalización eléctrica diferencial sobre par trenzado, a tasas de \num{12.5}~kbps o \num{100}~kbps, que son propias en las aeronaves. Evidentemente, esta capa física es imposible de reproducir en este proyecto, ya que el transporte se realiza por radiofrecuencia. En cambio, lo que si se implementa es la capa lógica, la estructura interna de la palabra, las etiquetas, las reglas de codificación, etc.
+
+El formato de palabra, las etiquetas, la estructura del paquete y el algoritmo de planificación que reparte los \textit{slots} se detallan en el \cref{ch:firmware}.
+

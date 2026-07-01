@@ -1,0 +1,85 @@
+\documentclass[11pt,a4paper,oneside]{report}
+
+% Cargar paquetes
+\input{../Common/packages.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                      CONFIGURACIÓN DEL DOCUMENTO                       
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Configuración de tablas
+\captionsetup[table]{skip=10pt}
+\setlength{\tabcolsep}{12pt}
+\renewcommand{\arraystretch}{1.3}
+
+% Configuración de figuras
+\captionsetup[figure]{skip=10pt}
+
+% Profundidad del índice
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+
+% INICIO DEL DOCUMENTO                         
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              PORTADA                                   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{Files/00_Portada}
+
+% Página en blanco después de portada
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\vfill
+\begin{center}
+    \textit{Intentionally left blank}
+\end{center}
+\vfill
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         PÁGINAS PRELIMINARES                           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\pagestyle{fancy}
+\pagenumbering{Roman}
+
+% --- Índice general ---
+\tableofcontents
+\cleardoublepage
+
+% --- Índice de figuras ---
+\listoffigures
+\cleardoublepage
+
+% --- Índice de tablas ---
+\listoftables
+\cleardoublepage
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         CONTENIDO PRINCIPAL                            
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{arabic}
+
+% Anexo 1
+\input{Files/10_ANNEX_1.tex}
+\cleardoublepage
+
+% Anexo 2
+\input{Files/20_ANNEX_2.tex}
+\cleardoublepage
+
+% Anexo 3
+\input{Files/30_ANNEX_3.tex}
+\cleardoublepage
+
+
+
+\end{document}
+
+

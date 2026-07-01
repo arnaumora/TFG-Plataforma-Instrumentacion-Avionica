@@ -1,0 +1,11 @@
+100 μF Tantalum (3216-18 / Case A)		Capacitor_Tantalum_SMD		CP_EIA-3216-18_Kemet-A
+
+10 μF Tantalum (2917 Imp. / Case D)		Capacitor_Tantalum_SMD		CP_EIA-7343-31_Kemet-D
+
+470 nF Ceramic (1812 package)			Capacitor_SMD			C_1812_4532Metric
+
+330 nF Ceramic (1206 package)			Capacitor_SMD			C_1206_3216Metric
+
+100 nF Ceramic (1206 package)			Capacitor_SMD			C_1206_3216Metric
+
+10 nF Ceramic (1206 package)			Capacitor_SMD			C_1206_3216Metric

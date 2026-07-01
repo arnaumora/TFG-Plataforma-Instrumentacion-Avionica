@@ -1,0 +1,720 @@
+%!TEX root = ../main.tex
+
+\chapter{Diseño de firmware}
+\label{ch:firmware}
+
+El \cref{ch:hardware} ha definido la plataforma física sobre la que se ejecuta
+el firmware. En este capítulo se detalla el software que adquiere las
+medidas de los sensores, las fusiona para obtener las magnitudes de vuelo y las
+transmite codificadas en ARINC 429 hasta el nodo receptor. Se describe primero
+el firmware del nodo transmisor, después la capa lógica de telemetría
+compartida por ambos nodos y, por último, el firmware del nodo receptor. La
+visualización en el PC se trata en el \cref{ch:software}.
+
+
+\section{Entorno de desarrollo y organización del código}
+\label{sec:fw_entorno}
+
+Ambos nodos se programan sobre el framework de Arduino para ESP32
+\cite{ds_esp32s3, ds_esp32c3}, lo que cumple la restricción de herramientas de
+código abierto (RC02) y mantiene un único entorno compartido por el transmisor
+y el receptor.
+
+El firmware del transmisor se organiza de forma modular. Cada sistema se compila de forma individual en su propia unidad de compilación, mientras que dos cabeceras compilan los elementos comunes entre todos los nodos. \texttt{SensorData.h} define las estructuras de datos
+que comparten todos los módulos y \texttt{Config.h} agrupa en un único lugar todas las constantes: pines, escalas de los
+sensores, ganancias del filtro, declinación magnética y constantes de
+calibración. Esta separación permite sustituir o corregir un driver sin afectar
+al resto y deja un único archivo donde reconfigurar la plataforma. Las
+bibliotecas empleadas se resumen en la \cref{tab:fw_libs}.
+
+\begin{table}[H]
+    \centering
+    \caption{Bibliotecas empleadas en el firmware del transmisor}
+    \label{tab:fw_libs}
+    \footnotesize
+    \begin{tabularx}{\linewidth}{l l X}
+        \toprule
+        \textbf{Subsistema} & \textbf{Biblioteca} & \textbf{Función} \\
+        \midrule
+        IMU + magnetómetro & acceso a registros propio & Lectura del MPU-9250 y el AK8963 (\cite{kriswiner_mpu9250}). \\
+        Barómetro          & Adafruit\_BMP280 \cite{lib_bmp280} & Configuración y lectura del BMP280. \\
+        GPS                & TinyGPSPlus \cite{lib_tinygps} & Parseo de tramas NMEA del NEO-6M. \\
+        Radar              & MyLD2410 \cite{lib_myld2410} & Configuración y lectura del HLK-LD2410C. \\
+        ToF                & VL53L1X (Pololu) \cite{lib_vl53l1x} & Lectura del VL53L1X. \\
+        Radio              & RF24 \cite{lib_rf24} & Control del nRF24L01+. \\
+        Bus I2C            & Wire (Arduino core) & Bus compartido de los sensores I2C. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+La \cref{fig:fw-arquitectura-tx-vertical} resume la organización del sistema. El flujo
+nace en los sensores físicos, pasa por cada uno de sus drivers y por las
+estructuras de \texttt{SensorData.h}, se procesa en la fusión y converge en la
+capa de telemetría que multiplexa los parámetros y los transmite.
+
+\begin{figure}[H]
+  \centering
+  \resizebox{0.7\textwidth}{!}{%
+  \begin{tikzpicture}[
+      font=\small,
+      >={Stealth[length=2.2mm]},
+      hw/.style  ={draw, rounded corners=2pt, fill=black!6,  minimum height=8mm, minimum width=26mm, align=center},
+      drv/.style ={draw, fill=blue!10,   minimum height=8mm, minimum width=24mm, align=center},
+      dat/.style ={draw, fill=green!12,  minimum height=7mm, minimum width=22mm, align=center},
+      proc/.style={draw, fill=orange!18, minimum height=8mm, minimum width=26mm, align=center},
+      tel/.style ={draw, fill=red!12,    minimum height=12mm, minimum width=154mm, align=center},
+      rf/.style  ={draw, fill=violet!12, minimum height=8mm, minimum width=40mm, align=center},
+      ctl/.style ={draw, dashed, fill=yellow!18, align=center, rounded corners=2pt, text width=145mm, inner sep=3mm},
+      df/.style  ={->, thick},
+      cf/.style  ={->, dashed, gray, thick}
+    ]
+
+    % --- Orquestador loop() (Capa superior) ---
+    \node[ctl, fill=cyan!12] (loop) at (0, 3.5)
+        {FlightInstruments.ino :: loop() -- planificador cooperativo\\
+         IMU+fusión 100 Hz, barómetro 10 Hz, telemetría 20 Hz; GPS/radar/ToF cada iteración (no bloqueante)};
+
+    % --- Config.h (Ahora debajo del loop y sobre los sensores) ---
+    \node[ctl] (cfg) at (0, 1.7)
+        {Config.h -- parametros: pines, escalas, ganancias Kp/Ki, declinación, calibración hard/soft iron};
+
+    % --- Sensores (Capa Hardware, y=0) ---
+    \node[hw] (s_imu)   at (-6.4, 0) {MPU-9250\\+ AK8963};
+    \node[hw] (s_baro)  at (-3.2, 0) {BMP280};
+    \node[hw] (s_tof)   at (0, 0)    {VL53L1X};
+    \node[hw] (s_gps)   at (3.2, 0)  {NEO-6M};
+    \node[hw] (s_radar) at (6.4, 0)  {HLK-LD2410C};
+
+    % --- Drivers (y=-2) ---
+    \node[drv] (d_imu)   at (-6.4, -2) {IMU.ino};
+    \node[drv] (d_baro)  at (-3.2, -2) {Barometer.ino};
+    \node[drv] (d_tof)   at (0, -2)    {ToF.ino};
+    \node[drv] (d_gps)   at (3.2, -2)  {GPS.ino};
+    \node[drv] (d_radar) at (6.4, -2)  {Radar.ino};
+
+    % --- Estructuras (SensorData.h, y=-4) ---
+    \node[dat] (st_imu)   at (-6.4, -4) {RawIMU};
+    \node[dat] (st_baro)  at (-3.2, -4) {BaroData};
+    \node[dat] (st_tof)   at (0, -4)    {ToFData};
+    \node[dat] (st_gps)   at (3.2, -4)  {GPSData};
+    \node[dat] (st_radar) at (6.4, -4)  {RadarData};
+
+    % --- Procesamiento (y=-6 y -7.5 en la columna izquierda) ---
+    \node[proc] (fusion) at (-6.4, -6.0) {SensorFusion.ino\\(Mahony MARG)};
+    \node[dat]  (flight) at (-6.4, -7.5) {FlightData};
+
+    % --- Telemetria (Embudo horizontal, y=-9.5) ---
+    \node[tel] (tele) at (0, -9.5)
+        {Telemetry.ino (planificador EDF por etiqueta) \\ {}[\textit{lib}] ARINC429};
+
+    % --- Salida radio (y=-11.5) ---
+    \node[rf] (nrf) at (0, -11.5) {NRF24L01+PA+LNA};
+
+    % ================= RUTADO DE FLECHAS =================
+
+    % --- Flujo Hardware -> Driver ---
+    \draw[df] (s_imu)   -- node[right,font=\scriptsize]{I2C}   (d_imu);
+    \draw[df] (s_baro)  -- node[right,font=\scriptsize]{I2C}   (d_baro);
+    \draw[df] (s_tof)   -- node[right,font=\scriptsize]{I2C}   (d_tof);
+    \draw[df] (s_gps)   -- node[right,font=\scriptsize]{UART1} (d_gps);
+    \draw[df] (s_radar) -- node[right,font=\scriptsize]{UART2} (d_radar);
+
+    % --- Flujo Driver -> Estructura ---
+    \draw[df] (d_imu)   -- (st_imu);
+    \draw[df] (d_baro)  -- (st_baro);
+    \draw[df] (d_tof)   -- (st_tof);
+    \draw[df] (d_gps)   -- (st_gps);
+    \draw[df] (d_radar) -- (st_radar);
+
+    % --- Flujo Fusión (Columna IMU) ---
+    \draw[df] (st_imu) -- (fusion);
+    \draw[df] (fusion) -- (flight);
+
+    % --- Flujo hacia Telemetría ---
+    \draw[df] (flight)   -- (flight |- tele.north);
+    \draw[df] (st_baro)  -- (st_baro |- tele.north);
+    \draw[df] (st_tof)   -- (st_tof |- tele.north);
+    \draw[df] (st_gps)   -- (st_gps |- tele.north);
+    \draw[df] (st_radar) -- (st_radar |- tele.north);
+
+    % --- Telemetría -> Radio ---
+    \draw[df] (tele) -- (nrf);
+    \draw[df] (nrf.east) -- ++(2,0) 
+        node[right,align=left,font=\scriptsize]{enlace 2.4 GHz\\-> nodo receptor};
+
+    % --- Dependencia cruzada (Gating Doppler) ---
+    \draw[cf] (st_gps.east) to[out=0,in=180] 
+        node[right,font=\scriptsize,align=left]{$v_{GPS}$\\(Doppler)} (d_radar.west);
+
+    % --- Enlaces de control (loop y config) ---
+    \draw[cf] (loop.south) -- (cfg.north);
+    \draw[cf] (cfg.south)  -- (0, 0.8); % Línea indicativa hacia la capa de hardware/drivers
+
+  \end{tikzpicture}%
+  }
+  \caption{Arquitectura modular top-down del firmware. Se ilustra el flujo completo de los datos, desde el hardware hasta la transmisión final.}
+  \label{fig:fw-arquitectura-tx-vertical}
+\end{figure}
+
+\section{Bucle principal y planificación cooperativa}
+\label{sec:fw_loop}
+
+El nodo transmisor no utiliza un sistema operativo en tiempo real, sino una planificación cooperativa más sencilla. En cada loop del bucle principal (loop()), el programa revisa unos temporizadores y ejecuta solo las tareas cuyo periodo se ha cumplido. De este modo, cada subsistema funciona a su propia frecuencia sin interrumpir a los demás.
+
+Las tareas y sus frecuencias se resumen en la \cref{tab:fw_rates}. La
+adquisición de datos de la IMU y la fusión se ejecutan a \SI{100}{\hertz}, el barómetro a
+\SI{10}{\hertz} y la telemetría a \SI{20}{\hertz}, coherente con el RP03 y con
+el periodo de \SI{50}{\milli\second} del enlace. Los buffers UART del GPS y del
+radar se vacían en cada iteración, ya que si se descuidan aunque sea un ciclo, la
+UART se satura y se pierden tramas. El ToF y el GPS se leen de forma oportunista, en cada iteración se consulta el sensor y la estructura se actualiza únicamente cuando hay datos válidos disponibles, conservando el último valor conocido en caso contrario.
+
+\begin{table}[H]
+    \centering
+    \caption{Tareas del bucle principal del transmisor}
+    \label{tab:fw_rates}
+    \begin{tabularx}{\linewidth}{X l l}
+        \toprule
+        \textbf{Tarea} & \textbf{Frecuencia} & \textbf{Mecanismo} \\
+        \midrule
+        Adquisición inercial + fusión & \SI{100}{\hertz} & Temporizada (\texttt{micros}) \\
+        Lectura del barómetro         & \SI{10}{\hertz}  & Temporizada (\texttt{millis}) \\
+        Envío de telemetría           & \SI{20}{\hertz}  & Temporizada (\texttt{millis}) \\
+        Alimentación de UART (GPS, radar) & Cada iteración & Sondeo continuo \\
+        Lectura de ToF y GPS          & Oportunista       & Sondeo por disponibilidad \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+
+En cuanto a la inicialización de los sensores se aplica una jerarquía de criticidad. La IMU es el único
+sensor cuyo fallo detiene el arranque, ya que es el único sensor esencial, sin él no hay horizonte artificial. El resto de sensores se tratan de forma distinta, si alguno no responde, el sistema continúa y su parámetro se transmite con el SSM en estado
+NO\_DATA (\cref{sec:fw_word}), que el receptor descarta.
+
+
+\section{Adquisición inercial}
+\label{sec:fw_imu}
+
+La IMU MPU-9250 integra acelerómetro y giroscopio y, conectado internamente, el
+magnetómetro AK8963. El driver (\texttt{IMU.ino}) accede directamente a los
+registros de los 3 sensores a través del bus I2C compartido a \SI{400}{\kilo\hertz},
+siguiendo las hojas de datos \cite{ps_mpu9250, ds_ak8963}.
+
+Tras comprobar el registro de identidad, el acelerómetro se configura a
+$\pm 4\,g$ y el giroscopio a $\pm 500\,^{\circ}/\mathrm{s}$, con un filtro
+digital interno a unos \SI{42}{\hertz}. El AK8963 no es accesible directamente,
+por lo que se habilita el modo \textit{bypass} del MPU-9250 para hacerlo visible en el
+bus. A continuación se lee su matriz de sensibilidad de fábrica (ASA), la cual corrige la ganancia de cada eje, y se configura en modo
+continuo de 16 bits a \SI{100}{\hertz}.
+
+Un detalle relevante de implementación es la diferencia de \textit{endianness}
+entre ambos integrados: el MPU-9250 entrega los datos en formato big-endian y el
+AK8963 en little-endian, por lo que la composición de los bytes difiere para
+cada uno. La aceleración, la temperatura y el giro se leen en una única ráfaga
+de 14 bytes. La lectura del magnetómetro exige leer también su registro de
+estado para que prepare la siguiente muestra.
+
+El pipeline completo del magnetómetro consiste de 3 etapas desde la lectura de los datos: la conversión a microteslas
+con la sensibilidad de fábrica (ASA), la resta del offset de hierro duro y el
+reescalado por el factor de hierro blando. El valor final queda de la forma siguiente:
+\begin{equation}
+    m_i^{\text{cal}} = s_i\,\bigl(k\,\mathrm{ASA}_i\,\tilde{m}_i - b_i\bigr),
+    \qquad i \in \{x,y,z\}
+\end{equation}
+donde $\tilde{m}_i$ es la lectura base, $k$ la sensibilidad nominal, y
+$b_i$ y $s_i$ provienen de la calibración realizada, descrita en la
+\cref{sec:fw_calibracion}, cuyas constantes quedan  fijadas en \texttt{Config.h}.
+
+
+\section{Calibración}
+\label{sec:fw_calibracion}
+
+\subsection{Bias del giroscopio}
+\label{sec:fw_cal_gyro}
+
+El bias del giroscopio se estima en cada arranque (\texttt{Calibration.ino}). Se
+promedian \num{500} muestras con el sensor en reposo y se calcula su varianza;
+si la varianza máxima de los tres ejes queda por debajo de un umbral, la media
+se acepta como bias. Si se detecta movimiento durante la captura (varianza
+alta), se descarta el valor y se recurre a un valor por defecto obtenido previamente.
+Teóricamente, el término integral podría converger al valor correcto sin la calibración inicial, pero de esta forma la convergencia es mucho más rápida.
+
+\subsection{Calibración del magnetómetro (hierro duro y blando)}
+\label{sec:fw_cal_mag}
+
+La calibración de hierro duro y blando del magnetómetro se realiza una sola vez
+con el sistema completo en funcionamiento (radio transmitiendo y resto de
+sensores activos) y lejos de estructuras ferromagnéticas. Calibrar así, con todos los sensores activos es
+necesario porque el offset de hierro duro no recoge únicamente los materiales
+magnetizados, sino también el campo generado por las corrientes continuas de la
+propia placa. La rutina se compila condicionalmente en el firmware principal, activada por la macro
+\texttt{CALIBRATE\_MAG}, así se hace la calibración y después esa parte del código no se compila en condición de uso normal. Los datos se recogen con el sensor girando lentamente en todas las orientaciones durante \SI{30}{\second}, se registran los valores mínimo y máximo
+de cada eje. El offset de hierro duro centra el elipsoide medida en el origen
+y el factor de hierro blando lo reescala hacia una esfera:
+\begin{equation}
+    b_i = \tfrac{1}{2}\bigl(m_i^{\max}+m_i^{\min}\bigr), \qquad
+    s_i = \frac{\bar{r}}{r_i}, \quad
+    r_i = \tfrac{1}{2}\bigl(m_i^{\max}-m_i^{\min}\bigr)
+\end{equation}
+con $\bar{r}$ el radio medio de los tres ejes. 
+Los seis valores obtenidos (1 por cada eje, para blando y duro) se fijan como constantes en \texttt{Config.h}.
+
+Por otro lado, la declinación magnética (diferencia entre el norte magnético medido y el norte
+geográfico) se añade como constante en la fusión. El rumbo resultante es ligeramente sensible al entorno magnético. En condiciones de campo limpio se mantiene estable, mientras que en interiores las distorsiones del campo magnético local
+lo degradan de forma notable. Esta degradación en interiores se cuantifica en el
+\cref{ch:validacion}.
+
+
+\section{Fusión de actitud: filtro de Mahony}
+\label{sec:fw_fusion}
+
+En la fusión de la actitud y el rumbo se emplea el filtro complementario no lineal de Mahony sobre el grupo $SO(3)$ \cite{mahony2008}, el cual va alimentado por los 9 ejes de la IMU (acelerómetro, giroscopio y magnetómetro). La decisión de por qué se elige este filtro ya ha sido explicada en \cref{sec:ea_fusion}. También la decisión de implementar la fusión en firmware, en lugar de delegarla a un sensor con fusión integrada, se justificó en la \cref{sec:sel_imu} por su valor docente.
+
+El núcleo del filtro corrige la medida del giroscopio basándose en un error de
+orientación construido a partir de las direcciones de la gravedad y del campo
+magnético. El error es la suma de los productos vectoriales entre cada vector
+medido (normalizado) y su dirección esperada según el cuaternión actual se expresa como:
+
+\begin{equation}
+    \mathbf{e} = \mathbf{a}\times\hat{\mathbf{v}}_g + \mathbf{m}\times\hat{\mathbf{v}}_m
+\end{equation}
+Para que el rumbo no afecte a la corrección de inclinación, el vector magnético de referencia se
+proyecta eliminando su componente transversal. El controlador PI corrige la velocidad angular
+y se integra el cuaternión, que se renormaliza en cada paso:
+\begin{equation}
+    \hat{\omega} = \omega_g + K_p\,\mathbf{e} + K_i\!\int \mathbf{e}\,dt,
+    \qquad
+    \dot{\mathbf{q}} = \frac{1}{2}\,\mathbf{q}\otimes(0,\hat{\omega})
+\end{equation}
+La \cref{fig:mahony_block} resume esta estructura.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        font=\small, >=Stealth,
+        blk/.style={draw, rounded corners=2pt, align=center, minimum height=9mm, inner sep=3pt, fill=black!5},
+        io/.style ={draw, align=center, minimum height=9mm, inner sep=3pt, fill=blue!8},
+        sum/.style={draw, circle, minimum size=6mm, inner sep=0pt}]
+
+        % fila superior
+        \node[io]  (gyro) {Giroscopio\\$\omega_g$};
+        \node[sum, right=14mm of gyro] (sum) {\large$+$};
+        \node[blk, right=12mm of sum]  (int)  {Integración del\\cuaternión};
+        \node[blk, right=10mm of int]  (norm) {Normalización};
+        \node[draw, circle, inner sep=1pt, right=10mm of norm, fill=green!12] (q) {$\mathbf{q}$};
+        \node[blk, right=10mm of q]    (euler){Ángulos de\\Euler (P,R,H)};
+
+        % fila inferior
+        \node[io]  (am)  at ($(gyro)+(0,-22mm)$) {Acelerómetro $\mathbf{a}$\\Magnetómetro $\mathbf{m}$};
+        \node[blk] (err) at ($(int)+(0,-22mm)$)  {Error de orientación\\$\mathbf{e}=\mathbf{a}\times\hat{\mathbf{v}}_g+\mathbf{m}\times\hat{\mathbf{v}}_m$};
+        \node[blk] (pi)  at ($(norm)+(0,-22mm)$) {Controlador PI\\$K_p\,\mathbf{e}+K_i\!\int\!\mathbf{e}\,dt$};
+
+        \draw[->] (gyro) -- (sum);
+        \draw[->] (sum)  -- (int);
+        \draw[->] (int)  -- (norm);
+        \draw[->] (norm) -- (q);
+        \draw[->] (q)    -- (euler);
+        \draw[->] (am)   -- (err);
+        \draw[->] (err)  -- (pi);
+
+        % corrección PI hacia el sumador
+        \draw[->] (pi) -- ([yshift=6mm]pi.north) -| (sum)
+            node[pos=0.25, above, font=\scriptsize] {corrección};
+
+        % realimentación del cuaternión hacia el error
+        \draw[->, dashed] (q.south) -- ($(q.south)+(0,-31mm)$) -| (err.south)
+            node[pos=0.25, below, font=\scriptsize] {actitud estimada $\mathbf{q}$};
+    \end{tikzpicture}%
+    }
+    \caption{Estructura del filtro complementario de Mahony. La velocidad
+             angular del giroscopio se corrige con un término PI cuyo error
+             procede de la gravedad y el campo magnético medidos frente a sus
+             direcciones esperadas según el cuaternión, que se realimenta.}
+    \label{fig:mahony_block}
+\end{figure}
+
+El cuaternión se convierte a ángulos de Euler y de ahí al convenio aeronáutico
+NED. En este punto se aplican pequeños offsets de montaje en cabeceo y alabeo, la declinación magnética y el offset entre el adelante de la IMU y el de la PCB, valores que se recogen en (\cref{tab:mahony_params}). Inicialmente el magnetómetro se reorienta al sistema de ejes del acelerómetro y giroscopio, ya que están rotados entre sí. Para que el filtro arranque ya cerca de la orientación real,
+el cuaternión se inicializa mediante un alineamiento analítico inicial (acelerómetro y magnetómetro) a partir de una sola muestra, en lugar de partir del cuaternión identidad.
+
+\begin{table}[H]
+    \centering
+    \caption{Parámetros del filtro de Mahony y correcciones de actitud}
+    \label{tab:mahony_params}
+    \begin{tabularx}{\linewidth}{X l l}
+        \toprule
+        \textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor} \\
+        \midrule
+        Ganancia proporcional  & $K_p$ & \num{3.0} \\
+        Ganancia integral      & $K_i$ & \num{1.0} \\
+        Declinación magnética  & --    & $1.95^{\circ}$ \\
+        Offset de montaje (cabeceo) & -- & $0.6^{\circ}$ \\
+        Offset de montaje (alabeo)  & -- & $0.2^{\circ}$ \\
+        Offset de rumbo (IMU--PCB)  & -- & $-5.0^{\circ}$ \\
+        Tasa de actualización  & --    & \SI{100}{\hertz} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+\section{Adquisición barométrica}
+\label{sec:fw_baro}
+
+El barómetro BMP280 (\texttt{Barometer.ino}, biblioteca de Adafruit
+\cite{lib_bmp280}) se configura con sobremuestreo de presión $\times 16$, de
+temperatura $\times 2$, filtro IIR $\times 16$ y modo normal con un tiempo de
+reposo de \SI{62.5}{\milli\second}. Esta combinación de tiempo de conversión y
+reposo da una tasa de salida próxima a los \SI{10}{\hertz} de lectura.
+
+La altitud sobre el nivel del mar se obtiene de la presión mediante la fórmula
+de la atmósfera estándar \cite{icao_isa}, con la presión de referencia a nivel
+del mar utilizada $p_0 = \SI{1013.25}{\hecto\pascal}$:
+\begin{equation}
+    h = 44330\left[1 - \left(\frac{p}{p_0}\right)^{0{,}1903}\right]
+\end{equation}
+La velocidad vertical se calcula por diferencias finitas de la altitud y
+se suaviza con un filtro exponencial (EMA). El filtro IIR interno del sensor reduce el ruido de presión, pero la
+discriminación del LSB hace que la derivada directa avance a saltos, por esto se aplica el EMA.
+
+\begin{equation}
+    v_s[k] = (1-\alpha)\,v_s[k-1] + \alpha\,\frac{h[k]-h[k-1]}{\Delta t},
+    \qquad \alpha = 0{,}2
+\end{equation}
+
+
+
+\section{Posicionamiento GNSS}
+\label{sec:fw_gps}
+
+El receptor NEO-6M (\texttt{GPS.ino}) se lee mediante la biblioteca TinyGPSPlus
+sobre UART1. Sus bytes se alimentan en cada iteración del bucle para no perder
+tramas NMEA. El driver distingue dos estados: \textit{ok}, que indica que la
+UART recibe datos aunque no haya satélites suficientes para determinar posición, y \textit{fix}, que
+indica posición válida. Los campos derivados (altitud, velocidad, rumbo de
+tierra y satélites) solo se refrescan cuando el dato correspondiente es válido,
+conservando el último valor conocido en caso contrario.
+
+El NEO-6M es un receptor exclusivamente GPS, sin GLONASS ni Galileo, lo que limita la precisión de los valores a \SI{2.5}{\meter} CEP. La tasa de actualización que ofrece es suficiente para la frecuencia a la que el
+planificador retransmite los parámetros GPS (\cref{sec:scheduler}).
+
+
+\section{Sensores de proximidad}
+\label{sec:fw_proximidad}
+
+La medida de distancia al suelo se aborda con dos sensores de tecnología
+distinta, acorde con (RF06). El telémetro láser de tiempo de vuelo VL53L1X es el sensor
+principal y el radar FMCW HLK-LD2410C el secundario. La
+razón de esta jerarquía es la fiabilidad observada. El ToF entrega una distancia
+métrica estable, mientras que la clasificación del radar es ambigua y sensible
+al \textit{clutter}.
+
+\paragraph{Tiempo de vuelo.}
+El VL53L1X (\texttt{ToF.ino}, biblioteca de Pololu \cite{lib_vl53l1x}) se
+configura en modo de largo alcance (hasta \SI{4}{\meter}) con un presupuesto
+de tiempo de \SI{50}{\milli\second} por medida y lectura continua a
+\SI{20}{\hertz}. La lectura es no bloqueante, solo actualiza la estructura cuando
+hay una muestra lista. Por debajo de una zona muerta de \SI{40}{\milli\meter} la
+medida se marca como no válida.
+
+\paragraph{Radar.}
+El HLK-LD2410C (\texttt{Radar.ino}, biblioteca MyLD2410) es un radar de
+\SI{24}{\giga\hertz} que reparte el alcance en puertas de distancia. Se
+configura en alta resolución (\SI{20}{\centi\meter} por puerta, 9 puertas,
+alcance \SI{1.8}{\meter}). Los
+umbrales por puerta se ajustan a una orientación hacia el suelo: umbrales altos
+en las puertas cercanas, para rechazar el \textit{clutter} del propio chasis y
+la vibración, y bajos en las lejanas, para no perder el suelo a mayor distancia.
+Sobre la distancia de la puerta dominante (la de mayor energía) se aplica un
+suavizado EMA y un valor mínimo que descarta ecos residuales de baja energía.
+
+Además, el sensor dispone de clasificación Doppler, para distinguir entre objetivos móviles y estáticos. El problema es que en este uso, puede ser que esté en movimiento la placa y no el objetivo. Por esto, esta clasificación se habilita únicamente
+cuando la velocidad GPS está por debajo de un umbral de reposo. Ambas distancias
+se transmiten en la telemetría (el ToF como radioaltímetro, el radar como
+distancia de radar), pero el PFD utiliza el ToF como única fuente 
+(\cref{ch:software}).
+
+
+\section{Implementación de la telemetría ARINC 429}
+\label{sec:arinc_hw}
+
+Como se introdujo en la \cref{sec:arinc_arq}, la telemetría se codifica en la
+capa lógica del estándar ARINC 429 \cite{arinc429}. La capa física diferencial
+del estándar no se implementa, ya que el transporte es a través de radiofrecuencia. Esta
+sección detalla el formato de palabra, las etiquetas, la codificación BNR, la
+paridad y el SSM (RN04), así como la estructura del paquete y el planificador que
+reparte los parámetros sobre el enlace. La biblioteca \texttt{ARINC429},
+desarrollada para el proyecto, implementa la construcción y decodificación de
+palabras y es compartida por ambos nodos.
+
+\subsection{Formato de palabra}
+\label{sec:fw_word}
+
+Cada palabra ARINC 429 ocupa 32 bits repartidos en cinco campos
+(\cref{fig:arinc_word}): la etiqueta (\textit{label}, 8 bits en octal)
+identifica el parámetro, el SDI (2 bits) identifica origen o destino, el campo
+de datos (19 bits) transporta los valores, el SSM (2 bits) indica el estado del
+dato, y el bit de paridad cierra la palabra.
+
+\begin{figure}[H]
+    \centering
+    \setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.2}
+    \begin{tabularx}{\linewidth}{|c|c|>{\centering\arraybackslash}X|c|c|}
+        \hline
+        \cellcolor{orange!18}P & SSM & \cellcolor{blue!8}Datos (BNR / discreta) & SDI & \cellcolor{background_light}Label (octal) \\
+        \scriptsize 32 & \scriptsize 31--30 & \scriptsize bits 29--11 (19 bits) & \scriptsize 10--9 & \scriptsize bits 8--1 \\
+        \hline
+    \end{tabularx}
+    \caption{Formato de la palabra ARINC 429 de 32 bits.}
+    \label{fig:arinc_word}
+\end{figure}
+
+Los parámetros numéricos se codifican en formato binario BNR. El valor se escala
+por una resolución por bit (LSB) y se almacena como entero con signo de 19 bits
+en complemento a dos, saturando si excede el rango:
+\begin{equation}
+    D = \mathrm{round}\!\left(\frac{x}{\text{LSB}}\right),
+    \qquad D \in \left[-2^{18},\, 2^{18}-1\right]
+\end{equation}
+La \cref{tab:arinc_labels} recoge las etiquetas empleadas con su codificación y
+resolución. Las etiquetas de actitud, rumbo, altitudes, velocidad vertical y
+posición son estándar, mientras que la distancia de radar y la palabra de estado usan
+etiquetas libres no asignadas por la norma.
+
+\begin{table}[H]
+    \centering
+    \caption{Etiquetas ARINC 429 empleadas (etiqueta en octal)}
+    \label{tab:arinc_labels}
+    \footnotesize
+    \begin{tabularx}{\linewidth}{X c c l}
+        \toprule
+        \textbf{Parámetro} & \textbf{Etiqueta} & \textbf{Cod.} & \textbf{LSB} \\
+        \midrule
+        Cabeceo (pitch)        & 0324  & BNR & $180/2^{18}\ {}^{\circ}$ \\
+        Alabeo (roll)          & 0325  & BNR & $180/2^{18}\ {}^{\circ}$ \\
+        Rumbo magnético        & 0320  & BNR & $180/2^{18}\ {}^{\circ}$ \\
+        Altitud barométrica    & 0204  & BNR & \num{0.5} ft \\
+        Velocidad vertical     & 0365  & BNR & \num{0.125} ft/min \\
+        Altitud GPS            & 0076  & BNR & \num{0.5} ft \\
+        Radioaltímetro (ToF)   & 0164  & BNR & \num{0.0625} ft \\
+        Distancia de radar     & 0166$^{*}$ & BNR & \SI{0.01}{\meter} \\
+        Latitud$^{\dagger}$    & 0310  & BNR & $1/2^{18}\ {}^{\circ}$ \\
+        Longitud$^{\dagger}$   & 0311  & BNR & $1/2^{18}\ {}^{\circ}$ \\
+        Estado (status)        & 0270$^{*}$ & discreta & -- \\
+        \bottomrule
+    \end{tabularx}
+
+    \vspace{2pt}
+    {\footnotesize $^{*}$ etiqueta libre, no asignada por la norma.\\
+    $^{\dagger}$ codificada como desplazamiento respecto a una referencia local
+    ($41^{\circ}$,\,$1^{\circ}$) para alcanzar mejor resolución .}
+\end{table}
+
+El SSM toma cuatro valores: operación normal, sin datos, prueba funcional y
+fallo. El firmware transmite \textsc{normal} cuando el dato es válido y
+\textsc{no\_data} cuando el sensor correspondiente está fuera de servicio. El
+receptor descarta cualquier palabra que no sea \textsc{normal}. Por último, el
+bit 32 implementa paridad impar, se fija de modo que el número total de unos de
+la palabra sea impar, lo que permite al receptor detectar palabras corruptas.
+
+La latitud y la longitud emplean etiquetas estándar, pero con una resolución por
+bit más fina que la nominal. Con una única palabra BNR de 19 bits y rango global
+(\(\pm 180^{\circ}\)), la posición quedaría cuantizada a una rejilla de unos
+\SI{76}{\meter}, muy por encima del error del receptor. Por ello se codifica el
+desplazamiento respecto a una referencia local fija, lo que reduce el rango a
+\(\pm 1^{\circ}\) y mejora la resolución hasta unos \SI{0.42}{\meter}. El receptor
+reconstruye la coordenada absoluta sumando de nuevo dicha referencia.
+
+\subsection{Estructura del paquete de telemetría}
+\label{sec:estructura_paquete}
+
+El payload del nRF24L01+ es de \SI{32}{\byte}, valor que coincide exactamente con 8
+palabras ARINC 429 de 32 bits. Esta coincidencia permite evitar fragmentar el paquete
+(\cref{sec:enlace}). Las tres primeras palabras transportan siempre la actitud y
+el rumbo, los parámetros más críticos, en cada paquete a \SI{20}{\hertz}, las
+cinco restantes se multiplexan entre el resto de parámetros según el
+planificador de la \cref{sec:scheduler}.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[node distance=0mm, font=\footnotesize]
+
+        \def\slotW{16mm}
+        \def\slotH{12mm}
+
+        % Slots fijos
+        \node[block, fill=background_light, minimum width=\slotW, minimum height=\slotH]
+            (s0) {Slot 0\\\footnotesize Pitch};
+        \node[block, fill=background_light, minimum width=\slotW, minimum height=\slotH, right=of s0]
+            (s1) {Slot 1\\\footnotesize Roll};
+        \node[block, fill=background_light, minimum width=\slotW, minimum height=\slotH, right=of s1]
+            (s2) {Slot 2\\\footnotesize Heading};
+
+        % Slots multiplexados
+        \node[block, minimum width=\slotW, minimum height=\slotH, right=of s2] (s3) {Slot 3};
+        \node[block, minimum width=\slotW, minimum height=\slotH, right=of s3] (s4) {Slot 4};
+        \node[block, minimum width=\slotW, minimum height=\slotH, right=of s4] (s5) {Slot 5};
+        \node[block, minimum width=\slotW, minimum height=\slotH, right=of s5] (s6) {Slot 6};
+        \node[block, minimum width=\slotW, minimum height=\slotH, right=of s6] (s7) {Slot 7};
+
+        % Llaves superiores (¡Direccion corregida de izquierda a derecha!)
+        \draw [decorate, decoration={brace, amplitude=4pt, raise=2pt}]
+            (s0.north west) -- (s2.north east)
+            node[midway, above=6pt, font=\footnotesize\itshape] {Fijos (20\,Hz)};
+        \draw [decorate, decoration={brace, amplitude=4pt, raise=2pt}]
+            (s3.north west) -- (s7.north east)
+            node[midway, above=6pt, font=\footnotesize\itshape] {Multiplexados (EDF)};
+
+        % Etiqueta inferior centrada bajo todo el paquete
+        \node[below=4mm of s3.south east, font=\footnotesize]
+            {Paquete completo: 8 palabras x 32 bits = 32 bytes, enviado a 20\,Hz};
+
+    \end{tikzpicture}
+    \caption{Estructura del paquete de telemetría sobre el payload de
+             \SI{32}{\byte} del nRF24L01+.}
+    \label{fig:estructura_paquete}
+\end{figure}
+
+\subsection{Planificador de tasas}
+\label{sec:scheduler}
+
+Cada parámetro multiplexado tiene un periodo nominal (\cref{tab:scheduler_assignment}).
+En cada paquete, los cinco slots disponibles se asignan con una política del
+tipo \textit{earliest deadline first} (EDF): para cada parámetro se calcula su
+retraso respecto a su periodo nominal y se eligen, de mayor a menor retraso. Si en un slot no hay ningún parámetro pendiente, se rellena
+con una palabra vacía (etiqueta 0, SSM \textsc{no\_data}) que el receptor
+ignora. La palabra de estado incorpora un número de secuencia que permite al
+receptor estimar la salud del enlace a partir de las palabras de estado perdidas
+(a \SI{5}{\hertz}).
+
+La viabilidad del reparto se comprueba sumando la demanda de los parámetros
+multiplexados: cuatro a \SI{10}{\hertz} y cuatro a \SI{5}{\hertz} requieren
+$4\times10 + 4\times5 = \num{60}$ palabras por segundo, frente a las
+$5\times20 = \num{100}$ ranuras multiplexadas disponibles. El margen resultante
+absorbe los retrasos puntuales sin que ningún parámetro supere su periodo. Se
+emplea EDF en lugar de un turno fijo (\textit{round-robin}) porque prioriza
+automáticamente el parámetro más atrasado, lo que acota el retraso máximo de cada
+magnitud.
+
+\begin{table}[H]
+    \centering
+    \caption{Asignación de parámetros del planificador}
+    \label{tab:scheduler_assignment}
+    \begin{tabularx}{\linewidth}{l X l}
+        \toprule
+        \textbf{Parámetro} & \textbf{Magnitud} & \textbf{Tasa} \\
+        \midrule
+        Pitch & Cabeceo & \SI{20}{\hertz} (slot fijo) \\
+        Roll & Alabeo & \SI{20}{\hertz} (slot fijo) \\
+        Heading & Rumbo magnético & \SI{20}{\hertz} (slot fijo) \\
+        \midrule
+        Pres.~altitude & Altitud barométrica & \SI{10}{\hertz} \\
+        Vertical speed & Velocidad vertical & \SI{10}{\hertz} \\
+        Radar distance & Distancia radar & \SI{10}{\hertz} \\
+        Radio altitude & Distancia ToF (radioaltímetro) & \SI{10}{\hertz} \\
+        \midrule
+        GPS altitude & Altitud GPS & \SI{5}{\hertz} \\
+        Latitude & Latitud & \SI{5}{\hertz} \\
+        Longitude & Longitud & \SI{5}{\hertz} \\
+        Status & Estado y validez del sistema & \SI{5}{\hertz} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+La configuración  del transceptor adoptada se resume en la \cref{tab:nrf24_config}.
+La tasa de \num{250}~kbps se elige por su buen compromiso entre
+sensibilidad y velocidad: un paquete completo con reconocimiento ocupa
+aproximadamente \SI{2}{\milli\second}, dentro del periodo de
+\SI{50}{\milli\second} fijado por la tasa de \SI{20}{\hertz} de la
+arquitectura. La potencia se ajusta al máximo, optimizando para uso
+en interior con obstáculos.
+
+\begin{table}[H]
+    \centering
+    \caption{Configuración del transceptor nRF24L01+ adoptada}
+    \label{tab:nrf24_config}
+    \begin{tabularx}{\linewidth}{l X}
+        \toprule
+        \textbf{Parámetro} & \textbf{Valor} \\
+        \midrule
+        Frecuencia portadora        & Banda ISM \SI{2.4}{\giga\hertz} \\
+        Tasa de datos               & \num{250}~kbps \\
+        Tamaño de payload           & \SI{32}{\byte} (fijo) \\
+        CRC                         & 2 bytes (habilitado) \\
+        Reconocimiento automático   & Habilitado (Enhanced ShockBurst) \\
+        Reintentos automáticos      & Hasta 15 (Enhanced ShockBurst) \\
+        Nivel de potencia de salida & Máximo del módulo PA/LNA \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+
+\section{Nodo receptor}
+\label{sec:fw_receptor}
+
+El nodo receptor (ESP32-C3 Super Mini, \texttt{FlightInstruments\_Receiver.ino})
+recibe los paquetes por el enlace y los entrega al PC. Su transceptor nRF24L01+
+se configura con el mismo canal y tasa que el transmisor.
+
+\paragraph{Decodificación.}
+Cada paquete se procesa palabra a palabra: se comprueba la paridad, se descartan
+las palabras vacías o corruptas y, según la etiqueta, se actualiza el campo
+correspondiente de una caché de estado. Esta caché funciona como
+\textit{hold-last-good}, cada parámetro conserva su último valor válido y solo
+se refresca cuando llega una palabra con SSM \textsc{normal}. Como excepción, el
+radioaltímetro (ToF) y la distancia de radar se ponen a cero cuando su palabra
+llega sin datos, de modo que el indicador de proximidad no se queda congelado en
+un valor antiguo.
+
+\paragraph{Detección de pérdidas.}
+A partir del número de secuencia, que viaja en la palabra de estado a
+\SI{5}{\hertz} (contador de 6 bits, módulo 64), el receptor detecta huecos entre
+palabras de estado: un salto distinto del esperado se contabiliza como palabra de
+estado perdida, salvo que sea muy grande, en cuyo caso se asume un reinicio del
+transmisor. Este recuento es un indicador de salud del enlace a \SI{5}{\hertz}, no
+una medida exacta de pérdida de paquetes. Cada
+segundo se emite un resumen de estadísticas del enlace y, tras \SI{3}{\second}
+sin recibir nada, un aviso de enlace caído.
+
+\paragraph{Salida al PC.}
+El estado decodificado se envía por serial a \SI{20}{\hertz} como una frase de
+texto delimitada por comas (\texttt{\$TEL}), con las conversiones de unidades que
+espera el PFD. La sentencia se emite por dos vías en paralelo
+(\cref{fig:rx_dataflow}): el puerto serie USB, que es la vía empleada por el PFD
+de Processing (\cref{ch:software}), y un \textit{broadcast} UDP sobre un punto de
+acceso WiFi propio del receptor, pensado para visualización en un dispositivo Android.
+
+\begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        font=\small, >=Stealth,
+        blk/.style={draw, rounded corners=2pt, align=center, minimum height=9mm, inner sep=3pt, fill=black!5},
+        io/.style ={draw, align=center, minimum height=9mm, inner sep=3pt, fill=blue!8}]
+        \node[io]  (nrf) {NRF24L01+\\(recepción)};
+        \node[blk, right=10mm of nrf] (dec) {\texttt{processWord()}\\paridad + SSM};
+        \node[blk, right=10mm of dec] (st)  {\texttt{DecodedState}\\\textit{hold-last-good}};
+        \node[blk, right=10mm of st]  (tel) {Serialización\\sentencia \texttt{\$TEL}};
+        \node[io, above right=5mm and 12mm of tel] (pc)  {Serial USB\\$\rightarrow$ PC (PFD)};
+        \node[io, below right=5mm and 12mm of tel] (udp) {UDP broadcast\\$\rightarrow$ cliente móvil};
+        \draw[->] (nrf) -- (dec);
+        \draw[->] (dec) -- (st);
+        \draw[->] (st)  -- (tel);
+        \draw[->] (tel) -- (pc);
+        \draw[->] (tel) -- (udp);
+    \end{tikzpicture}%
+    }
+    \caption{Cadena de procesamiento del nodo receptor: decodificación palabra a
+             palabra, caché de último valor válido y doble salida hacia el PC
+             (serie USB) y hacia un cliente móvil (UDP).}
+    \label{fig:rx_dataflow}
+\end{figure}
+
+\paragraph{Una limitación documentada.}
+Hay un aspecto de la telemetría que conviene señalar. Dos de los indicadores de estado que
+llegan al PFD (IMU y radio) se fuerzan a \textit{correcto} de forma incondicional
+en cuanto llega cualquier paquete, por lo que no reflejan la salud real de esos
+subsistemas. Concretamente la IMU, la cual es el sensor
+crítico de arranque (si fallara, el transmisor no llegaría a emitir) y por otro lado la
+presencia de paquetes implica que la radio funciona. Aun así, en el resto de indicadores sí se indica la salud real.

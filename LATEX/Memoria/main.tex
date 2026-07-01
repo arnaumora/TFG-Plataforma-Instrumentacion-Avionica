@@ -1,0 +1,157 @@
+\documentclass[11pt,a4paper,oneside]{report}
+
+% Cargar paquetes
+\input{../Common/packages.tex}
+
+% Externalizacion de figuras TikZ
+\usetikzlibrary{external}
+\tikzexternalize[
+    prefix=Diagramas/cache/,
+    optimize=false
+]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                      CONFIGURACIÓN DEL DOCUMENTO                       
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Configuración de tablas
+\captionsetup[table]{skip=10pt}
+\setlength{\tabcolsep}{12pt}
+\renewcommand{\arraystretch}{1.5}
+
+% Configuración de figuras
+\captionsetup[figure]{skip=10pt}
+
+% Profundidad del índice
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+
+% INICIO DEL DOCUMENTO                         
+
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              PORTADA                                   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\include{Files/00_Portada}
+
+% Página en blanco después de portada
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\vfill
+\begin{center}
+    \textit{Intentionally left blank}
+\end{center}
+\vfill
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         PÁGINAS PRELIMINARES                           
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\pagestyle{fancy}
+\pagenumbering{Roman}
+
+% --- Resumen / Abstract ---
+\input{Files/01_Abstract}
+
+% --- Índice general ---
+\tableofcontents
+\cleardoublepage
+
+% --- Índice de figuras ---
+\listoffigures
+\cleardoublepage
+
+% --- Índice de tablas ---
+\listoftables
+\cleardoublepage
+
+
+% --- Nomenclatura / Abreviaturas ---
+\input{Files/02_Nomenclatura}
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         CONTENIDO PRINCIPAL                            
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagenumbering{arabic}
+
+
+% Capítulo 1: Introducción
+\input{Files/10_Introduccion}
+\cleardoublepage
+
+% Capítulo 2: Estado del Arte
+\input{Files/20_Estado_del_Arte}
+\cleardoublepage
+
+% Capítulo 3: Requisitos del sistema
+\input{Files/30_Requisitos.tex}
+\cleardoublepage
+
+% Capítulo 4: Arquitectura
+\input{Files/35_Arquitectura.tex}
+\cleardoublepage
+
+% Capítulo 5: Diseño del Hardware
+\input{Files/40_Diseno_Hardware}
+\cleardoublepage
+
+% Capítulo 6: Diseño del Firmware
+\input{Files/45_Diseno_Firmware.tex}
+\cleardoublepage
+
+% Capítulo 7: Desarrollo del Software
+\input{Files/50_Diseno_Software.tex}
+\cleardoublepage
+
+% Capitulo de Integracion y Pruebas: integrado dentro del capitulo de
+% validacion experimental, no se usa como capitulo independiente.
+%\input{Files/60_Integracion_Pruebas}
+
+% Capítulo 8: Validación experimental
+\input{Files/70_Resultados}
+\cleardoublepage
+
+% Capítulo 9: Presupuesto
+\input{Files/80_Presupuesto}
+\cleardoublepage
+
+% Capítulo 10: Análisis de sostenibilidad e implicaciones
+\input{Files/90_Impacto_Ambiental}
+\cleardoublepage
+
+% Capítulo 11: Conclusiones y Trabajo Futuro
+\input{Files/100_Conclusiones}
+\cleardoublepage
+
+% Capítulo 12: Declaración de uso de IA generativa
+\input{Files/105_Declaracion_IA}
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                            BIBLIOGRAFÍA                                
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% OJO: \nocite{*} imprime TODAS las entradas del .bib aunque no las cites
+% (anade ~26 referencias no citadas). Se deja comentado para que la
+% bibliografia solo liste lo que citas de verdad. Descomentar solo si el
+% tribunal quiere una lista completa de obras consultadas.
+%\nocite{*}
+\printbibliography[heading=bibnumbered, title={Referencias}]
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              APÉNDICES                                 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+% Sin apendices dentro de la memoria: el codigo (anexos) se entrega como
+% documento independiente, en la carpeta Anexos con su propio main.tex.
+
+\end{document}

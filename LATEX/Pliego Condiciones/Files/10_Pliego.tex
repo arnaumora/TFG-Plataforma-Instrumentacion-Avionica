@@ -1,0 +1,101 @@
+% ============================================================
+%  CUERPO DEL PLIEGO DE CONDICIONES
+%  Se incluye desde main.tex con \input{Files/10_Pliego}
+%  Usa los paquetes y comandos definidos en ../Common/packages.tex
+%  (\code, \file, siunitx, cleveref, booktabs, tabularx).
+% ============================================================
+
+\chapter{Objeto y alcance del pliego}
+\label{ch:pliego_objeto}
+
+Este pliego recoge las condiciones técnicas que deben cumplir los componentes, el montaje, el firmware y el software de la plataforma experimental de instrumentación aviónica, junto con los criterios empleados para dar el sistema por válido.
+
+La plataforma es un prototipo experimental con finalidad docente, no un sistema destinado a certificación aeronáutica ni a explotación comercial. Por este motivo, las condiciones que se fijan son de carácter técnico y de aceptación, no contractuales: no se establecen condiciones económicas de obra, fianzas ni relaciones entre contratista y promotor, al no existir tales figuras en un trabajo de estas características.
+
+
+\chapter{Condiciones de los componentes}
+\label{ch:pliego_componentes}
+
+Los componentes empleados deben respetar los rangos de operación indicados en sus hojas de características. La \cref{tab:pliego_componentes} resume las condiciones de alimentación e interfaz de cada uno.
+
+\begin{table}[H]
+    \centering
+    \caption{Condiciones de alimentación e interfaz de los componentes}
+    \label{tab:pliego_componentes}
+    \begin{tabularx}{\linewidth}{l l l X}
+        \toprule
+        \textbf{Componente} & \textbf{Alim.} & \textbf{Bus} & \textbf{Nota} \\
+        \midrule
+        ESP32-S3 DevKitC-1 (N16R8) & \SI{3.3}{\volt} & --- & Nodo transmisor \\
+        ESP32-C3 Super Mini & \SI{3.3}{\volt} & --- & Nodo receptor \\
+        IMU MPU-9250 (+ AK8963) & \SI{3.3}{\volt} & I\textsuperscript{2}C & Actitud y rumbo \\
+        Barómetro BMP280 & \SI{3.3}{\volt} & I\textsuperscript{2}C & Presión y altitud \\
+        GPS NEO-6M & \SI{3.3}{\volt} & UART & Posición y velocidad \\
+        ToF VL53L1X & \SI{3.3}{\volt} & I\textsuperscript{2}C & Distancia \\
+        Radar HLK-LD2410C & \SI{5}{\volt} & UART & Requiere rail de \SI{5}{\volt} \\
+        Radio NRF24L01+PA+LNA & \SI{3.3}{\volt} & SPI & Sensible al rizado de alimentación \\
+        Regulador NJM12856DL3 & \SI{5}{\volt} ent. & --- & Genera el rail de \SI{3.3}{\volt} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+El módulo de radio NRF24L01+PA+LNA es especialmente sensible a las variaciones de tensión durante la transmisión, por lo requiere de condensadores de desacoplo en sus terminales de alimentación. El regulador NJM12856DL3 incorpora los condensadores de entrada (\SI{330}{\nano\farad}), de salida (\SI{470}{\nano\farad}) y el de \SI{10}{\nano\farad} en el terminal CS, según se detalla en la memoria.
+
+
+\chapter{Condiciones de montaje e integración}
+\label{ch:pliego_montaje}
+
+El diseño de la placa de circuito impreso debe respetar el esquema eléctrico y mantener el plano de masa en ambas caras para reducir el acoplamiento de ruido. La placa es de dos capas y se fabrica mediante JLCPCB.
+
+La plataforma se alimenta a través del conector USB-C. El regulador NJM12856DL3 genera el rail de \SI{3.3}{\volt} que alimenta la mayoría de los componentes, mientras que el rail de \SI{5}{\volt} procedente del USB alimenta los que lo requieren, como el radar HLK-LD2410C. El prototipo no incorpora batería.
+
+Las asignaciones de pines de cada nodo deben coincidir con las definidas en \file{Config.h}, en particular las del módulo de radio del nodo receptor. El conjunto debe ser compacto y transportable para su uso en laboratorio (RC03).
+
+
+\chapter{Condiciones del firmware y del software}
+\label{ch:pliego_firmware}
+
+El firmware de ambos nodos se compila con el IDE de Arduino y el soporte para ESP32 (objetivos ESP32-S3 y ESP32-C3). La estación de tierra se ejecuta sobre el entorno Processing.
+
+Todas las librerías empleadas son de código abierto: RF24, Pololu VL53L1X, MyLD2410, TinyGPSPlus y Adafruit BMP280, entre otras. 
+
+Antes de su uso, el magnetómetro debe calibrarse para compensar las distorsiones de hierro duro y blando. La calibración se realiza mediante la rutina de calibración integrada en el firmware del transmisor, activada por la macro \code{CALIBRATE\_MAG}, y sus resultados se fijan como constantes \code{\#define} en \file{Config.h} (RF02).
+
+El enlace de telemetría implementa una capa lógica ARINC 429 sobre el módulo NRF24L01. Como la carga útil del NRF24 está limitada a \SI{32}{\byte}, los campos se multiplexan mediante un planificador que reparte el ancho de banda por tasas: cabeceo, alabeo y rumbo a \SI{20}{\hertz}; presión, radar y ToF a \SI{10}{\hertz}; GPS y estado a \SI{5}{\hertz}. El receptor decodifica las etiquetas y entrega los datos en formato CSV (\code{\$TEL}) al PFD. 
+
+
+\chapter{Condiciones de pruebas y aceptación}
+\label{ch:pliego_aceptacion}
+
+Los criterios de aceptación se basan en los requisitos de rendimiento del proyecto. Al tratarse de una plataforma experimental, los umbrales son valores orientativos coherentes con la normativa de referencia, no condiciones de cumplimiento estricto. El sistema se considera aceptable si satisface los criterios de la \cref{tab:pliego_aceptacion}.
+
+\begin{table}[H]
+    \centering
+    \caption{Criterios de aceptación}
+    \label{tab:pliego_aceptacion}
+    \begin{tabularx}{\linewidth}{X l l}
+        \toprule
+        \textbf{Criterio} & \textbf{Umbral} & \textbf{Requisito} \\
+        \midrule
+        Latencia extremo a extremo (sensor a PFD) & $<\SI{200}{\milli\second}$ & RP01 \\
+        Tasa de refresco del PFD & $\geq 30$ FPS & RP02 \\
+        Enlace operativo a distancia de laboratorio sin avisos de enlace caído & --- & RP06 \\
+        Consistencia del rumbo frente a referencia & $\leq\ang{5}$ & RF02 \\
+        Tensión media del rail de \SI{3.3}{\volt} & $\approx\SI{3.32}{\volt}$ & --- \\
+        Rizado del rail de \SI{5}{\volt} & $\approx\SI{60}{\milli\volt}$ & --- \\
+        Entrega de telemetría a las tasas programadas & \SI{20}{}/\SI{10}{}/\SI{5}{\hertz} & RF07 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+El rail de \SI{5}{\volt} presenta caídas de tensión periódicas, de unos \SI{50}{\milli\second}, coincidentes con las ráfagas de transmisión del módulo de radio. Esta perturbación se considera admisible, ya que la mayoría de los sensores se alimentan a través del regulador de \SI{3.3}{\volt} y disponen de desacoplo local, por lo que no se ven afectados.
+
+El rumbo se ha verificado en interior como comprobación de consistencia frente a una referencia.  En el interior hay más interferencias que afectan las medidas del magnetómetro, pero esto es una limitación del ambiente, no del sistema. 
+
+
+\chapter{Condiciones generales}
+\label{ch:pliego_generales}
+
+Una vez presentado y autorizado, el trabajo se publica en acceso abierto en el repositorio UPCommons bajo licencia Creative Commons. Las librerías de terceros empleadas mantienen sus respectivas licencias de código abierto.
+
+La documentación se redacta en español y emplea el Sistema Internacional de unidades.

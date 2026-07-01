@@ -1,0 +1,49 @@
+%!TEX root = ../main.tex
+
+\thispagestyle{plain}
+
+\vfill
+
+{\Large\bfseries ABSTRACT}
+
+\vspace{-0.5cm}
+
+\hrulefill
+
+This project presents the design and implementation of a low-cost experimental platform for the emulation of avionics instrumentation, intended for educational use. The project arises from a gap observed in engineering courses: on one hand, existing flight controllers solve sensor fusion on low-cost devices, but they do not provide code that is easy to access and study in class. They also do not follow aeronautical display regulations. On the other hand, simulators offer Primary Flight Displays that comply with the standards, but without real hardware behind them. This platform brings both worlds together and lets the student follow the complete instrumentation chain, from the sensor to the display.
+
+The system is made up of three main subsystems. The first, the physical part, consists of a printed circuit board that integrates all the system components, specifically an ESP32-S3 microcontroller and the set of sensors (the MPU-9250 inertial measurement unit and magnetometer, the BMP280 barometer, the NEO-6M GNSS receiver, the VL53L1X time-of-flight sensor and an HLK-LD2410C radar). The next part of the system, the firmware, reads and calibrates the sensors, estimates attitude, heading, altitude and vertical speed using a Mahony filter, and transmits the results. The last one, the PFD, developed in Processing with the standard Basic-T layout, displays the received data on screen. In addition, the logical structure of the ARINC 429 aeronautical standard is incorporated to send the telemetry over an NRF24L01+ radio link at 250 kbps between a transmitter node and a receiver node.
+
+The three subsystems were integrated and verified against the previously defined requirements. The attitude estimation shows a maximum absolute error of 1.8 degrees under static conditions, the GNSS positioning a dispersion of 1.00 m CEP50, and the estimated worst-case end-to-end latency stays below 85 ms. During the design, decisions were always made with educational value as the main goal, giving preference to custom and transparent implementations. The result is a functional, open-source platform, replicable for under 100 euros and suitable for laboratory use. The system is not intended for flight or certification; it is a learning tool that exposes the entire instrumentation chain.
+
+\vspace{0.3cm}
+
+\noindent\textbf{Keywords:} avionics instrumentation, Primary Flight
+Display, sensor fusion, Mahony filter, ARINC 429.
+
+\vfill
+
+\newpage
+
+\thispagestyle{plain}
+
+\vfill
+
+{\Large\bfseries RESUMEN}
+
+\vspace{-0.5cm}
+
+\hrulefill
+
+En este proyecto se presenta el diseño e implementación de una plataforma experimental de bajo coste para la emulación de instrumentación aviónica, pensada para uso educativo. El proyecto nace de una carencia observada en las clases de ingeniería: por un lado, los controladores de vuelo existentes resuelven la fusión de sensores en dispositivos de bajo coste, pero no ofrecen código fácilmente accesible y estudiable en clase. Tampoco siguen las regulaciones aeronáuticas de visualización. Por otro lado, los simuladores ofrecen Primary Flight Displays conformes a la norma, pero sin hardware real detrás. Esta plataforma fusiona ambos mundos y permite al estudiante recorrer la cadena completa de instrumentación, desde el sensor hasta la pantalla.
+
+El sistema está compuesto por tres subsistemas principales. El primero, la parte física, se compone de una placa de circuito impreso que integra todos los componentes del sistema, en concreto un microcontrolador ESP32-S3 y el conjunto de sensores (la unidad inercial y magnetómetro MPU-9250, el barómetro BMP280, el receptor GNSS NEO-6M, el sensor de tiempo de vuelo VL53L1X y un radar HLK-LD2410C). La siguiente parte del sistema, el firmware, lee y calibra los sensores, estima la actitud, el rumbo, la altitud y la velocidad vertical mediante un filtro Mahony, y transmite los resultados. El último, el PFD, desarrollado en Processing con la disposición estándar Basic-T, representa en pantalla los datos recibidos. Además, se incorpora la estructura lógica del estándar aeronáutico ARINC 429 para enviar la telemetría sobre un enlace de radio NRF24L01+ a 250 kbps entre un nodo transmisor y uno receptor.
+
+Los tres subsistemas se integraron y verificaron frente a los requisitos previamente definidos. La estimación de actitud presenta un error absoluto máximo de 1,8 grados en condiciones estáticas, el posicionamiento GNSS una dispersión de 1,00 m de CEP50 y la latencia extremo a extremo estimada se mantiene por debajo de 85 ms. Durante el diseño, las decisiones se han tomado siempre con el valor didáctico como objetivo principal, dando preferencia a implementaciones propias y transparentes. El resultado es una plataforma funcional y de código abierto, replicable por menos de 100 euros y adecuada para uso en laboratorio. El sistema no está pensado para vuelo ni para certificación, es una herramienta de aprendizaje que expone toda la cadena de instrumentación.
+
+\vspace{0.3cm}
+
+\noindent\textbf{Palabras clave:} instrumentación aviónica, Primary Flight
+Display, fusión de sensores, filtro de Mahony, ARINC 429.
+
+\vfill

@@ -1,0 +1,39 @@
+%!TEX root = ../main.tex
+
+\chapter{Conclusiones y trabajo futuro}
+\label{ch:conclusiones}
+
+\section{Conclusiones}
+\label{sec:conclusiones}
+
+El objetivo principal del proyecto, el diseño y la implementación de una plataforma experimental de bajo coste para la emulación de instrumentación aviónica, se ha logrado satisfactoriamente. Se han creado los tres subsistemas planteados en la \cref{sec:objetivo}: una placa de circuito impreso que integra el microcontrolador y los sensores, un firmware que adquiere, calibra, fusiona y transmite los datos, y un Primary Flight Display desarrollado en Processing con la disposición Basic-T. Estos tres subsistemas han sido integrados y operan como un único sistema, tal y como se documenta en el \cref{ch:validacion}.
+
+Basado en los requisitos definidos, se extraen las siguientes conclusiones:
+
+\begin{itemize}
+    \item La fusión sensorial mediante el filtro Mahony MARG proporciona una estimación de actitud y rumbo estable en tiempo real. 
+
+    \item Reutilizar la capa lógica del estándar ARINC 429 sobre el enlace de radio permite estructurar la telemetría acorde a la práctica aeronáutica. El planificador por etiqueta encaja con la restricción de carga útil del transceptor, como se describe en el \cref{ch:firmware}.
+
+    \item La selección de componentes, orientada al valor didáctico, ofrece al estudiante acceso a las magnitudes intermedias del sistema y a los algoritmos subyacentes.
+
+    \item El PFD reproduce la disposición Basic-T marcada por la regulación y representa en tiempo real los parámetros calculados, cerrando la cadena desde el sensor hasta la pantalla.
+\end{itemize}
+
+En conjunto, la plataforma cumple su propósito. Permite recorrer toda la cadena de instrumentación aviónica, es de código abierto y se puede replicar por menos de \SI{100}{\eur} en materiales, lo que la hace adecuada para su uso en laboratorios docentes. Por otro lado, el sistema no incorpora la redundancia ni los mecanismos de seguridad requeridos en un equipo de vuelo, y la exactitud del rumbo en interiores queda limitada por el entorno magnético, como se analiza en la \cref{sec:val_rumbo}.
+
+
+\section{Trabajo futuro}
+\label{sec:trabajo_futuro}
+
+A partir de las actividades excluidas en la \cref{sec:exclusiones} y de las limitaciones identificadas, se proponen las siguientes líneas de continuación:
+
+\begin{itemize}
+    \item \textbf{Ampliación de la vista cartográfica.} La vista de mapa de navegación (\cref{sec:sw_mapa}) emplea teselas descargadas previamente en disco. El siguiente paso sería descargar las teselas en línea bajo demanda y cubrir más niveles de zoom.
+
+    \item \textbf{Integración en una plataforma de vuelo.} Adaptar el sistema para instalarlo en un vehículo aéreo, con todas las implicaciones de certificación y robustez que esto supondría.
+
+    \item \textbf{Representación del Flight Path Vector.} Incluirlo enriquecería el PFD, pero requiere datos adicionales de viento y de parámetros de navegación.
+
+    \item \textbf{Sistemas aviónicos adicionales.} La arquitectura del sistema permitiría incorporar funciones adicionales como radar meteorológico, TCAS, ADS-B o FMS.
+\end{itemize}

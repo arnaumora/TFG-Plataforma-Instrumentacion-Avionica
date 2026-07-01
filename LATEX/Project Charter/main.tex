@@ -1,0 +1,87 @@
+\documentclass[11pt,a4paper,oneside]{report}
+
+% Cargar paquetes
+\input{../Common/packages.tex}
+
+%%%%%%%%%%%%%%%% -------- CONFIGURACIÓN DOCUMENTO ---------%%%%%%%%%%%%%%%%%%%%
+
+%INTERLINEADO
+\setstretch{1.5}
+
+%CONFIGURACIÓN TABLES
+\captionsetup[table]{skip=10pt}
+\setlength{\tabcolsep}{20pt}
+\renewcommand{\arraystretch}{1.3}
+
+%CABECERAS
+
+% 3. REINICIAR Y REDEFINIR CABECERAS
+\pagestyle{fancy}
+\fancyhf{} 
+\setlength{\headheight}{45pt}
+
+% Ahora define las nuevas
+\fancyhead[L]{\includegraphics[width=5cm]{../Common/Shared_Figures/logo_eseiaat.png}} 
+\fancyhead[R]{Project Charter} 
+\fancyfoot[C]{\thepage}
+
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyhead[L]{\includegraphics[width=5cm]{../Common/Shared_Figures/logo_eseiaat.png}}
+    \fancyhead[R]{Project Charter}
+    \fancyfoot[C]{\thepage}
+}
+
+ 
+% INICIO DEL DOCUMENTO                         
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              PORTADA                                   
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input{Files/Portada}
+
+% Página en blanco después de portada
+\newpage
+\thispagestyle{empty}
+\mbox{}
+\vfill
+\begin{center}
+    \textit{Intentionally left blank}
+\end{center}
+\vfill
+
+\pagestyle{fancy}
+\pagenumbering{Roman}
+
+% Index
+\tableofcontents
+\listoffigures
+\listoftables
+%\input{Files/Abreviatures}
+
+\newpage
+
+%Seccions
+\pagenumbering{arabic}
+
+\input{Files/Objetivo}
+\newpage
+\input{Files/Alcance}
+\newpage
+\input{Files/Requisitos}
+\newpage
+\input{Files/Justificacion}
+\newpage
+\input{Files/Calendario}
+\newpage
+
+%Bibliografia
+
+\newpage
+\printbibliography[heading=bibnumbered, title={Referencias}]
+\cleardoublepage
+
+
+\end{document}

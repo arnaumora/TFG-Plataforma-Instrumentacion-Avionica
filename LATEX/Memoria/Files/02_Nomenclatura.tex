@@ -1,0 +1,84 @@
+%!TEX root = ../main.tex
+
+\chapter*{Nomenclatura}
+\addcontentsline{toc}{chapter}{Nomenclatura}
+\label{ch:nomenclatura}
+
+En este capítulo se define el convenio de ejes y los ángulos de actitud sobre los
+que se construye el PFD, y se recogen las siglas y acrónimos utilizados a lo largo del proyecto. 
+
+\section{Convenio de ejes y actitud}
+\label{sec:nom_ejes}
+
+A lo largo del proyecto se emplea el convenio aeronáutico de ejes NED (\textit{North-East-Down}),
+en el que los ejes de navegación apuntan al Norte, al Este y hacia abajo
+(en el sentido de la gravedad). El sistema de ejes solidario al cuerpo
+(\textit{body frame}) tiene su origen en la IMU, con el eje $x$ hacia el morro
+(adelante), el eje $y$ hacia el costado derecho y el eje $z$ hacia abajo.
+
+La actitud estimada por el filtro de fusión se expresa mediante tres ángulos de
+Euler en el convenio NED, que se corresponden con los tres grados de libertad de
+orientación de la aeronave:
+
+\begin{itemize}
+    \item \textbf{Cabeceo} (\textit{pitch}): rotación alrededor del eje $y$
+    (morro arriba o abajo).
+    \item \textbf{Alabeo} (\textit{roll}): rotación alrededor del eje $x$
+    (inclinación lateral de las alas).
+    \item \textbf{Rumbo} (\textit{heading}): rotación alrededor del eje $z$
+    (orientación respecto al Norte magnético).
+\end{itemize}
+
+En las figuras y en el código estos tres ángulos se abrevian como P, R y H,
+respectivamente. El cuaternión de actitud $\mathbf{q}$ es la representación
+interna de la orientación, a partir de la cual se obtienen los ángulos de Euler.
+
+\newpage
+\section{Siglas y acrónimos}
+\label{sec:nom_acronimos}
+
+Las siglas y acrónimos propios del ámbito aviónico, de sensores o específicos del proyecto se
+recogen en la \cref{tab:nom_acronimos}.
+
+\begin{xltabular}{\linewidth}{@{} l X @{}}
+    \caption{Siglas y acrónimos utilizados en el proyecto.} \label{tab:nom_acronimos} \\
+    \toprule
+    \textbf{Sigla} & \textbf{Significado} \\
+    \midrule
+    \endfirsthead
+    % Cabecera de las siguientes páginas
+    \toprule
+    \textbf{Sigla} & \textbf{Significado} \\
+    \midrule
+    \endhead
+    % Pie de tabla
+    \bottomrule
+    \endlastfoot
+    % Contenido
+    AHRS    & \textit{Attitude and Heading Reference System} (sistema de referencia de actitud y rumbo) \\
+    ARINC   & \textit{Aeronautical Radio, Incorporated} \\
+    ASA     & \textit{Sensitivity Adjustment} (valores de ajuste de sensibilidad de fábrica del magnetómetro AK8963) \\
+    BNR     & \textit{Binary Number Representation} (representación numérica binaria en ARINC 429) \\
+    CEP     & \textit{Circular Error Probable} (error circular probable) \\
+    EKF     & \textit{Extended Kalman Filter} (filtro de Kalman extendido) \\
+    EMA     & \textit{Exponential Moving Average} (media móvil exponencial) \\
+    FMCW    & \textit{Frequency-Modulated Continuous Wave} (onda continua modulada en frecuencia) \\
+    GNSS    & \textit{Global Navigation Satellite System} (sistema global de navegación por satélite) \\
+    ICGC    & \textit{Institut Cartogràfic i Geològic de Catalunya} (proveedor de teselas de mapa) \\
+    IIR     & \textit{Infinite Impulse Response} (respuesta al impulso infinita) \\
+    IMU     & \textit{Inertial Measurement Unit} (unidad de medida inercial) \\
+    ISM     & \textit{Industrial, Scientific and Medical} (banda de radio de uso libre) \\
+    LDO     & \textit{Low-Dropout} (regulador lineal de baja caída de tensión) \\
+    MARG    & \textit{Magnetic, Angular Rate and Gravity} (sensor de campo magnético, velocidad angular y gravedad) \\
+    MSL     & \textit{Mean Sea Level} (nivel medio del mar, referencia de altitud) \\
+    NED     & \textit{North-East-Down} (convenio de ejes Norte-Este-Abajo) \\
+    NMEA    & \textit{National Marine Electronics Association} (formato de tramas de los receptores GNSS) \\
+    PFD     & \textit{Primary Flight Display} (pantalla primaria de vuelo) \\
+    SDI     & \textit{Source/Destination Identifier} (identificador de fuente y destino en ARINC 429) \\
+    SSM     & \textit{Sign/Status Matrix} (matriz de signo y estado en ARINC 429) \\
+    ToF     & \textit{Time of Flight} (tiempo de vuelo) \\
+    USB-CDC & \textit{USB Communications Device Class} (puerto serie virtual sobre USB) \\
+    VSI     & \textit{Vertical Speed Indicator} (indicador de velocidad vertical) \\
+\end{xltabular}
+
+\null

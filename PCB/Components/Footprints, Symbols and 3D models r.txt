@@ -1,0 +1,15 @@
+Footprints, Symbols and 3D models references.
+
+https://grabcad.com/library/bmp280-module-1
+https://grabcad.com/library/gy-bme280-6-pin-version-1
+
+https://github.com/usini/usini_kicad_sensors
+
+https://www.snapeda.com/parts/ZC323200/YKS/view-part/?ref=search&t=GY-GPS6MV2&ab_test_case=b
+
+
+https://grabcad.com/library/nrf24l01-pa-lna-1/details?folder_id=3898944
+
+https://grabcad.com/library/mpu-9250-1
+
+https://grabcad.com/library/yd-esp32-s3-1
