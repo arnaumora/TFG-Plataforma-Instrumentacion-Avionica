@@ -93,5 +93,3 @@ Released under the MIT License. See [LICENSE](LICENSE).
 
 **Arnau Mora Pérez** - Aerospace Vehicle Engineering, UPC - ESEIAAT
 [linkedin.com/in/arnau-mora](https://www.linkedin.com/in/arnau-mora)
-# TFG-Plataforma-Instrumentacion-Avionica
-# TFG-Plataforma-Instrumentacion-Avionica
